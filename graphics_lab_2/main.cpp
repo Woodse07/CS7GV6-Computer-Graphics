@@ -31,7 +31,7 @@ uniform mat4 matScTrRo;                                              \n\
                                                                      \n\
 void main()                                                          \n\
 {                                                                    \n\
-    gl_Position = matScTrRo * vec4(vPosition.x, vPosition.y, vPosition.z, 1.0);  \n\
+    gl_Position = matScTrRo * vec4(vPosition.x, vPosition.y, vPosition.z, 3.0);  \n\
 	color = vColor;							                         \n\
 }";
 
@@ -166,78 +166,87 @@ void keyInputs(unsigned char key, int xmouse, int ymouse)
 	// Toggling options (scaling, translation, rotation)
 	switch (key) {
 		// Rotation
-		case ('r'):
+		case('r'):
 			keyArray['r'] = !keyArray['r'];
 			if (keyArray['r'] == false){
-				std::cout << "Rotation off\n" << std::endl;
+				std::cout << "Rotation off" << std::endl;
 			}
 			else {
-				std::cout << "Rotation on\n" << std::endl;
+				std::cout << "Rotation on" << std::endl;
 			}
 			break;
-		case ('R'):
+		case('R'):
 			keyArray['r'] = !keyArray['r'];
 			if (keyArray['r'] == false) {
-				std::cout << "Rotation off\n" << std::endl;
+				std::cout << "Rotation off" << std::endl;
 			}
 			else {
-				std::cout << "Rotation on\n" << std::endl;
+				std::cout << "Rotation on" << std::endl;
 			}
 			break;
 		// Translation
-		case ('t'):
+		case('t'):
 			keyArray['t'] = !keyArray['t'];
 			if (keyArray['t'] == false) {
-				std::cout << "Translation off\n" << std::endl;
+				std::cout << "Translation off" << std::endl;
 			}
 			else {
-				std::cout << "Translation on\n" << std::endl;
+				std::cout << "Translation on" << std::endl;
 			}
 			break;
-		case ('T'):
+		case('T'):
 			keyArray['t'] = !keyArray['t'];
 			if (keyArray['t'] == false) {
-				std::cout << "Translation off\n" << std::endl;
+				std::cout << "Translation off" << std::endl;
 			}
 			else {
-				std::cout << "Translation on\n" << std::endl;
+				std::cout << "Translation on" << std::endl;
 			}
 			break;
 		// Scaling
-		case ('s'):
+		case('s'):
 			keyArray['s'] = !keyArray['s'];
 			if (keyArray['s'] == false) {
-				std::cout << "Scaling off\n" << std::endl;
+				std::cout << "Scaling off" << std::endl;
 			}
 			else {
-				std::cout << "Scaling on\n" << std::endl;
+				std::cout << "Scaling on" << std::endl;
 			}
 			break;
-		case ('S'):
+		case('S'):
 			keyArray['s'] = !keyArray['s'];
 			if (keyArray['s'] == false) {
-				std::cout << "Scaling off\n" << std::endl;
+				std::cout << "Scaling off" << std::endl;
 			}
 			else {
-				std::cout << "Scaling on\n" << std::endl;
+				std::cout << "Scaling on" << std::endl;
 			}
 			break;
-		case ('x'):
+		case('x'):
 			keyArray['x'] = !keyArray['x'];
 			if (keyArray['x'] == false) {
-				std::cout << "Scaling on the X axis off\n" << std::endl;
+				std::cout << "Scaling on the X axis off" << std::endl;
 			}
 			else {
-				std::cout << "Scaling on the X axis on\n" << std::endl;
+				std::cout << "Scaling on the X axis on" << std::endl;
 			}
 			break;
-		case ('y'):
+		case('y'):
 			keyArray['y'] = !keyArray['y'];
 			if (keyArray['y'] == false) {
-				std::cout << "Scaling on the Y axis off\n" << std::endl;
+				std::cout << "Scaling on the Y axis off" << std::endl;
 			}
 			else {
-				std::cout << "Scaling on the Y axis on\n" << std::endl;
+				std::cout << "Scaling on the Y axis on" << std::endl;
+			}
+			break;
+		case('z'):
+			keyArray['z'] = !keyArray['z'];
+			if (keyArray['z'] == false) {
+				std::cout << "Scaling on the Z axis off" << std::endl;
+			}
+			else {
+				std::cout << "Scaling on the Z axis on" << std::endl;
 			}
 			break;
 		default:
@@ -247,21 +256,21 @@ void keyInputs(unsigned char key, int xmouse, int ymouse)
 	// Scaling, cleaning up matrix
 	matScale = identity_mat4();
 	if (keyArray['s'] == true) {
-		std::cout << "Scaling" << endl; 
-		if ((keyArray['x'] && keyArray['y']) == true) {
+		if ((keyArray['x'] && keyArray['y'] && keyArray['z']) == true) {
 			switch (key) {
 				case('+'):
-					std::cout << "Scaling up X and Y\n" << endl;
-					matScale = scale(matId, vec3(2.0f, 2.0f, 1.0f));
+					std::cout << "Scaling up X, Y, Z\n" << endl;
+					matScale = scale(matId, vec3(2.0f, 2.0f, 2.0f));
 					break;
 				case('-'):
-					std::cout << "Scaling down X and Y\n" << endl;
-					matScale = scale(matId, vec3(0.5f, 0.5f, 1.0f));
+					std::cout << "Scaling down X, Y, Z\n" << endl;
+					matScale = scale(matId, vec3(0.5f, 0.5f, 0.5f));
 					break;
 				default:
 					break;
 			}
-		}else if ((keyArray['x'] && !keyArray['y']) == true) {
+		// X only
+		}else if ((keyArray['x'] && !keyArray['y'] && !keyArray['z']) == true) {
 			switch (key) {
 				case('+'):
 					std::cout << "Scaling up X\n" << endl;
@@ -274,8 +283,8 @@ void keyInputs(unsigned char key, int xmouse, int ymouse)
 				default:
 					break;
 			}
-
-		}else if ((!keyArray['x'] && keyArray['y']) == true) {
+		// Y only
+		}else if ((!keyArray['x'] && keyArray['y'] && !keyArray['z']) == true) {
 			switch (key) {
 				case('+'):
 					std::cout << "Scaling up Y\n" << endl;
@@ -289,35 +298,60 @@ void keyInputs(unsigned char key, int xmouse, int ymouse)
 					break;
 			}
 
+		}else if ((!keyArray['x'] && !keyArray['y'] && keyArray['z']) == true) {
+			switch (key) {
+			case('+'):
+				std::cout << "Scaling up Z\n" << endl;
+				matScale = scale(matId, vec3(1.0f, 1.0f, 2.0f));
+				break;
+			case('-'):
+				std::cout << "Scaling down Z\n" << endl;
+				matScale = scale(matId, vec3(1.0f, 1.0f, 0.5f));
+				break;
+			default:
+				break;
+			}
+
 		}
 	}
 	// Translation, cleaning up matrix
 	matTranslate = identity_mat4();
-
 	if (keyArray['t'] == true) {
-		std::cout << "Translation" << endl;
 		switch (key) {
-			case('w'):
-				matTranslate.m[13] = 0.1f;
-				std::cout << "Translating + Y" << endl;
+			case('1'):
+				matTranslate.m[12] = 0.02f;
+				std::cout << "Translating + X" << endl;
 				break;
-			case('s'):
-				matTranslate.m[13] = -0.1f;
-				std::cout << "Translating - Y" << endl;
-				break;
-			case('a'):
-				matTranslate.m[12] = -0.1f;
+			case('2'):
+				matTranslate.m[12] = -0.02f;
 				std::cout << "Translating - X" << endl;
 				break;
-			case('d'):
-				matTranslate.m[12] = 0.1f;
-				std::cout << "Translating + X" << endl;
+			case('3'):
+				matTranslate.m[13] = 0.02f;
+				std::cout << "Translating + Y" << endl;
+				break;
+			case('4'):
+				matTranslate.m[13] = -0.02f;
+				std::cout << "Translating - Y" << endl;
+				break;
+			case('5'):
+				matTranslate.m[14] = 0.02f;
+				std::cout << "Translating + Z" << endl;
+				break;
+			case('6'):
+				matTranslate.m[14] = -0.02f;
+				std::cout << "Translating - Z" << endl;
 				break;
 			default:
 				break;
 		}
 	}
 	
+	// Rotation
+//	matRotate = identity_mat4();
+//	if (keyArray['r'] == true) {
+//		
+//	}
 	// Debug messages/prints of matrices
 	std::cout << "\nSTR Matrix Before";
 	print(matSTR);
@@ -329,9 +363,6 @@ void keyInputs(unsigned char key, int xmouse, int ymouse)
 	std::cout << "\nSTR Final Matrix";
 	print(matSTR);
 	std::cout << "\n" << endl;
-
-	// Clearing up Scale, Translate and Rotation matrices
-	matRotate = identity_mat4();
 }
 
 void init()
@@ -340,7 +371,6 @@ void init()
 	GLfloat vertices[] = {-1.0f, -1.0f, 0.0f,
 			1.0f, -1.0f, 0.0f,
 			0.0f, 1.0f, 0.0f};
-	printf("Vertices\n");
 	// Create a color array that identfies the colors of each vertex (format R, G, B, A)
 	GLfloat colors[] = {0.0f, 1.0f, 0.0f, 1.0f,
 			1.0f, 0.0f, 0.0f, 1.0f,
@@ -367,8 +397,8 @@ int main(int argc, char** argv){
 	// Keyboard Function Call
 	glutKeyboardFunc(keyInputs);
 	// Tell glut where the display function is
-	glutDisplayFunc(display);
-
+	//glutDisplayFunc(display);
+	glutIdleFunc(display);
 	 // A call to glewInit() must be done after glut is initialized!
     GLenum res = glewInit();
 	// Check for any errors

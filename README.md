@@ -1,2 +1,2 @@
-# -CS7GV6_Computer_Graphics
+# CS7GV6 Computer Graphics
 Trinity College Dublin  CS7GV6 Computer Graphics Assignments 

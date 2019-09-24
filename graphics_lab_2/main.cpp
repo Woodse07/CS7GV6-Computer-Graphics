@@ -1,12 +1,19 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 #include <iostream>
-//#include <maths_funcs.h>
+#include <maths_funcs.h>
 
 // Macro for indexing vertex buffer
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
 using namespace std;
+
+bool keyArray[127];
+mat4 matScale = identity_mat4();
+mat4 matTranslate = identity_mat4();
+mat4 matRotate = identity_mat4();
+mat4 matSTR = identity_mat4();
+
 
 // Vertex Shader (for convenience, it is defined in the main here, but we will be using text files for shaders in future)
 // Note: Input to this shader is the vertex positions that we specified for the triangle. 
@@ -18,11 +25,12 @@ static const char* pVS = "                                           \n\
 in vec3 vPosition;													 \n\
 in vec4 vColor;														 \n\
 out vec4 color;														 \n\
+uniform mat4 matScTrRo;                                              \n\
                                                                      \n\
                                                                      \n\
 void main()                                                          \n\
 {                                                                    \n\
-    gl_Position = vec4(vPosition.x, vPosition.y, vPosition.z, 1.0);  \n\
+    gl_Position = matScTrRo * vec4(vPosition.x, vPosition.y, vPosition.z, 1.0);  \n\
 	color = vColor;							                         \n\
 }";
 
@@ -37,8 +45,6 @@ void main()                                 \n\
 {                                           \n\
     FragColor = vec4(0.0, 1.0, 0.0, 1.0);	\n\
 }";
-
-bool keyArray[127];
 
 // Shader Functions- click on + to expand
 #pragma region SHADER_FUNCTIONS
@@ -270,6 +276,10 @@ void init()
 	generateObjectBuffer(vertices, colors);
 	// Link the current buffer to the shader
 	linkCurrentBuffertoShader(shaderProgramID);
+	// Link Matrix to Shader
+	GLint matID = glGetUniformLocation(shaderProgramID, "matScTrRo");
+	glUniformMatrix4fv(matID, 1, GL_FALSE, matSTR.m);
+
 }
 
 int main(int argc, char** argv){
@@ -277,7 +287,7 @@ int main(int argc, char** argv){
 	glutInit(&argc, argv);
 	// glutInitDisplay and Window creation
     glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);
-    glutInitWindowSize(800, 800);
+    glutInitWindowSize(800, 600);
     glutCreateWindow("Hello Lab #2");
 	// Keyboard Function Call
 	glutKeyboardFunc(keyInputs);

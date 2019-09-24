@@ -9,6 +9,7 @@
 using namespace std;
 
 bool keyArray[127];
+mat4 matId = identity_mat4();
 mat4 matScale = identity_mat4();
 mat4 matTranslate = identity_mat4();
 mat4 matRotate = identity_mat4();
@@ -162,6 +163,7 @@ void display(){
 
 void keyInputs(unsigned char key, int xmouse, int ymouse)
 {
+	// Toggling options (scaling, translation, rotation)
 	switch (key) {
 		// Rotation
 		case ('r'):
@@ -220,43 +222,81 @@ void keyInputs(unsigned char key, int xmouse, int ymouse)
 				std::cout << "Scaling on\n" << std::endl;
 			}
 			break;
+		case ('x'):
+			keyArray['x'] = !keyArray['x'];
+			if (keyArray['x'] == false) {
+				std::cout << "Scaling on the X axis off\n" << std::endl;
+			}
+			else {
+				std::cout << "Scaling on the X axis on\n" << std::endl;
+			}
+			break;
+		case ('y'):
+			keyArray['y'] = !keyArray['y'];
+			if (keyArray['y'] == false) {
+				std::cout << "Scaling on the Y axis off\n" << std::endl;
+			}
+			else {
+				std::cout << "Scaling on the Y axis on\n" << std::endl;
+			}
+			break;
 		default:
 			break;
 	}
-}
 
-void specialKeyInputs(int key, int x, int y)
-{
-	switch (key) {
-		// Keyboard inputs
-		case GLUT_KEY_UP:
-			std::cout << "Glut Up" << std::endl;
-			break;
-		case GLUT_KEY_DOWN:
-			std::cout << "Glut Down" << std::endl;
-			break;
-		case GLUT_KEY_LEFT:
-			std::cout << "Glut Left" << std::endl;
-			break;
-		case GLUT_KEY_RIGHT:
-			std::cout << "Glut Right" << std::endl;
-			break;
-		default:
-			break;
-	}
-	if (keyArray['r'] == true) {
-		std::cout << "Rotating" << endl;
-		// Call rotation
-	}
-	if (keyArray['t'] == true) {
-		std::cout << "Translating" << endl;
-		// Call Translation
-	}
+	// Scaling
 	if (keyArray['s'] == true) {
-		std::cout << "Scaling" << endl;
-		// Call Rotation
+		std::cout << "Scaling" << endl; 
+		if ((keyArray['x'] && keyArray['y']) == true) {
+			switch (key) {
+				case('+'):
+					std::cout << "Scaling up X and Y\n" << endl;
+					matScale = scale(matId, vec3(2.0f, 2.0f, 1.0f));
+					break;
+				case('-'):
+					std::cout << "Scaling down X and Y\n" << endl;
+					matScale = scale(matId, vec3(0.5f, 0.5f, 1.0f));
+					break;
+				default:
+					break;
+			}
+		}else if ((keyArray['x'] && !keyArray['y']) == true) {
+			switch (key) {
+				case('+'):
+					std::cout << "Scaling up X\n" << endl;
+					matScale = scale(matId, vec3(2.0f, 1.0f, 1.0f));
+					break;
+				case('-'):
+					std::cout << "Scaling down X\n" << endl;
+					matScale = scale(matId, vec3(0.5f, 1.0f, 1.0f));
+					break;
+				default:
+					break;
+			}
+
+		}else if ((!keyArray['x'] && keyArray['y']) == true) {
+			switch (key) {
+				case('+'):
+					std::cout << "Scaling up Y\n" << endl;
+					matScale = scale(matId, vec3(1.0f, 2.0f, 1.0f));
+					break;
+				case('-'):
+					std::cout << "Scaling down Y\n" << endl;
+					matScale = scale(matId, vec3(1.0f, 0.5f, 1.0f));
+					break;
+				default:
+					break;
+			}
+
+		}
 	}
+
+
+	std::cout << "Coordinates Matrix" << endl;
+	matSTR = matSTR * matScale;
+	print(matSTR);
 	std::cout << "\n" << endl;
+	matScale = identity_mat4();
 }
 
 void init()
@@ -291,7 +331,6 @@ int main(int argc, char** argv){
     glutCreateWindow("Hello Lab #2");
 	// Keyboard Function Call
 	glutKeyboardFunc(keyInputs);
-	glutSpecialFunc(specialKeyInputs);
 	// Tell glut where the display function is
 	glutDisplayFunc(display);
 

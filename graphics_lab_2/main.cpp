@@ -244,7 +244,8 @@ void keyInputs(unsigned char key, int xmouse, int ymouse)
 			break;
 	}
 
-	// Scaling
+	// Scaling, cleaning up matrix
+	matScale = identity_mat4();
 	if (keyArray['s'] == true) {
 		std::cout << "Scaling" << endl; 
 		if ((keyArray['x'] && keyArray['y']) == true) {
@@ -290,13 +291,47 @@ void keyInputs(unsigned char key, int xmouse, int ymouse)
 
 		}
 	}
+	// Translation, cleaning up matrix
+	matTranslate = identity_mat4();
 
-
-	std::cout << "Coordinates Matrix" << endl;
-	matSTR = matSTR * matScale;
+	if (keyArray['t'] == true) {
+		std::cout << "Translation" << endl;
+		switch (key) {
+			case('w'):
+				matTranslate.m[13] = 0.1f;
+				std::cout << "Translating + Y" << endl;
+				break;
+			case('s'):
+				matTranslate.m[13] = -0.1f;
+				std::cout << "Translating - Y" << endl;
+				break;
+			case('a'):
+				matTranslate.m[12] = -0.1f;
+				std::cout << "Translating - X" << endl;
+				break;
+			case('d'):
+				matTranslate.m[12] = 0.1f;
+				std::cout << "Translating + X" << endl;
+				break;
+			default:
+				break;
+		}
+	}
+	
+	// Debug messages/prints of matrices
+	std::cout << "\nSTR Matrix Before";
+	print(matSTR);
+	std::cout << "\nScale Matrix";
+	print(matScale);
+	std::cout << "\nTranslation Matrix";
+	print(matTranslate);
+	matSTR = (matSTR * matScale * matTranslate);
+	std::cout << "\nSTR Final Matrix";
 	print(matSTR);
 	std::cout << "\n" << endl;
-	matScale = identity_mat4();
+
+	// Clearing up Scale, Translate and Rotation matrices
+	matRotate = identity_mat4();
 }
 
 void init()

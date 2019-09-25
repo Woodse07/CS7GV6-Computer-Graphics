@@ -14,7 +14,7 @@ mat4 matScale = identity_mat4();
 mat4 matTranslate = identity_mat4();
 mat4 matRotate = identity_mat4();
 mat4 matSTR = identity_mat4();
-
+GLint uniform_matid;
 
 // Vertex Shader (for convenience, it is defined in the main here, but we will be using text files for shaders in future)
 // Note: Input to this shader is the vertex positions that we specified for the triangle. 
@@ -31,7 +31,7 @@ uniform mat4 matScTrRo;                                              \n\
                                                                      \n\
 void main()                                                          \n\
 {                                                                    \n\
-    gl_Position = matScTrRo * vec4(vPosition.x, vPosition.y, vPosition.z, 3.0);  \n\
+    gl_Position = matScTrRo * vec4(vPosition.x, vPosition.y, vPosition.z, 1.0);  \n\
 	color = vColor;							                         \n\
 }";
 
@@ -158,7 +158,7 @@ void display(){
 	// NB: Make the call to draw the geometry in the currently activated vertex buffer. This is where the GPU starts to work!
 	glDrawArrays(GL_TRIANGLES, 0, 3);
     glutSwapBuffers();
-
+	glutPostRedisplay();
 }
 
 void keyInputs(unsigned char key, int xmouse, int ymouse)
@@ -363,6 +363,7 @@ void keyInputs(unsigned char key, int xmouse, int ymouse)
 	std::cout << "\nSTR Final Matrix";
 	print(matSTR);
 	std::cout << "\n" << endl;
+	glUniformMatrix4fv(uniform_matid, 1, GL_FALSE, matSTR.m);
 }
 
 void init()
@@ -382,12 +383,13 @@ void init()
 	// Link the current buffer to the shader
 	linkCurrentBuffertoShader(shaderProgramID);
 	// Link Matrix to Shader
-	GLint matID = glGetUniformLocation(shaderProgramID, "matScTrRo");
-	glUniformMatrix4fv(matID, 1, GL_FALSE, matSTR.m);
+	uniform_matid = glGetUniformLocation(shaderProgramID, "matScTrRo");
+	glUniformMatrix4fv(uniform_matid, 1, GL_FALSE, matSTR.m);
 
 }
 
 int main(int argc, char** argv){
+	//matSTR.m[12] = 0.74;
 	// Set up the window
 	glutInit(&argc, argv);
 	// glutInitDisplay and Window creation
@@ -397,7 +399,7 @@ int main(int argc, char** argv){
 	// Keyboard Function Call
 	glutKeyboardFunc(keyInputs);
 	// Tell glut where the display function is
-	//glutDisplayFunc(display);
+	glutDisplayFunc(display);
 	glutIdleFunc(display);
 	 // A call to glewInit() must be done after glut is initialized!
     GLenum res = glewInit();

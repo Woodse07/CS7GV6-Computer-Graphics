@@ -13,6 +13,9 @@ mat4 matId = identity_mat4();
 mat4 matScale = identity_mat4();
 mat4 matTranslate = identity_mat4();
 mat4 matRotate = identity_mat4();
+mat4 matRotateX = identity_mat4();
+mat4 matRotateY = identity_mat4();
+mat4 matRotateZ = identity_mat4();
 mat4 matSTR = identity_mat4();
 GLint uniform_matid;
 
@@ -170,18 +173,10 @@ void keyInputs(unsigned char key, int xmouse, int ymouse)
 			keyArray['r'] = !keyArray['r'];
 			if (keyArray['r'] == false){
 				std::cout << "Rotation off" << std::endl;
-			}
-			else {
-				std::cout << "Rotation on" << std::endl;
-			}
-			break;
-		case('R'):
-			keyArray['r'] = !keyArray['r'];
-			if (keyArray['r'] == false) {
-				std::cout << "Rotation off" << std::endl;
-			}
-			else {
-				std::cout << "Rotation on" << std::endl;
+			}else {
+				std::cout << "Rotation on, Scale & Translation off!" << std::endl;
+				keyArray['s'] = false;
+				keyArray['t'] = false;
 			}
 			break;
 		// Translation
@@ -189,18 +184,10 @@ void keyInputs(unsigned char key, int xmouse, int ymouse)
 			keyArray['t'] = !keyArray['t'];
 			if (keyArray['t'] == false) {
 				std::cout << "Translation off" << std::endl;
-			}
-			else {
-				std::cout << "Translation on" << std::endl;
-			}
-			break;
-		case('T'):
-			keyArray['t'] = !keyArray['t'];
-			if (keyArray['t'] == false) {
-				std::cout << "Translation off" << std::endl;
-			}
-			else {
-				std::cout << "Translation on" << std::endl;
+			}else {
+				std::cout << "Translation on, Scaling & Rotation off!" << std::endl;
+				keyArray['s'] = false;
+				keyArray['r'] = false;
 			}
 			break;
 		// Scaling
@@ -208,26 +195,17 @@ void keyInputs(unsigned char key, int xmouse, int ymouse)
 			keyArray['s'] = !keyArray['s'];
 			if (keyArray['s'] == false) {
 				std::cout << "Scaling off" << std::endl;
-			}
-			else {
-				std::cout << "Scaling on" << std::endl;
-			}
-			break;
-		case('S'):
-			keyArray['s'] = !keyArray['s'];
-			if (keyArray['s'] == false) {
-				std::cout << "Scaling off" << std::endl;
-			}
-			else {
-				std::cout << "Scaling on" << std::endl;
+			}else {
+				std::cout << "Scaling on, Rotation & Translation off!" << std::endl;
+				keyArray['r'] = false;
+				keyArray['t'] = false;
 			}
 			break;
 		case('x'):
 			keyArray['x'] = !keyArray['x'];
 			if (keyArray['x'] == false) {
 				std::cout << "Scaling on the X axis off" << std::endl;
-			}
-			else {
+			}else {
 				std::cout << "Scaling on the X axis on" << std::endl;
 			}
 			break;
@@ -235,8 +213,7 @@ void keyInputs(unsigned char key, int xmouse, int ymouse)
 			keyArray['y'] = !keyArray['y'];
 			if (keyArray['y'] == false) {
 				std::cout << "Scaling on the Y axis off" << std::endl;
-			}
-			else {
+			}else {
 				std::cout << "Scaling on the Y axis on" << std::endl;
 			}
 			break;
@@ -244,8 +221,7 @@ void keyInputs(unsigned char key, int xmouse, int ymouse)
 			keyArray['z'] = !keyArray['z'];
 			if (keyArray['z'] == false) {
 				std::cout << "Scaling on the Z axis off" << std::endl;
-			}
-			else {
+			}else {
 				std::cout << "Scaling on the Z axis on" << std::endl;
 			}
 			break;
@@ -347,6 +323,36 @@ void keyInputs(unsigned char key, int xmouse, int ymouse)
 		}
 	}
 	
+	if (keyArray['r'] == true) {
+		switch (key) {
+			case('1'):
+				std::cout << "Rotating + X, 1 degree" << endl;
+				matRotate = rotate_x_deg(matRotate, 1);
+				break;
+			case('2'):
+				std::cout << "Rotating - X, 1 degree" << endl;
+				matRotate = rotate_x_deg(matRotate, -1);
+				break;
+			case('3'):
+				std::cout << "Rotating + Y, 1 degree" << endl;
+				matRotate = rotate_y_deg(matRotate, 1);
+				break;
+			case('4'):
+				std::cout << "Rotating - Y, 1 degree" << endl;
+				matRotate = rotate_y_deg(matRotate, -1);
+				break;
+			case('5'):
+				std::cout << "Rotating + Z, 1 degree" << endl;
+				matRotate = rotate_z_deg(matRotate, 1);
+				break;
+			case('6'):
+				std::cout << "Rotating - Z, 1 degree" << endl;
+				matRotate = rotate_z_deg(matRotate, -1);
+				break;
+			default:
+				break;
+		}
+	}
 	// Rotation
 //	matRotate = identity_mat4();
 //	if (keyArray['r'] == true) {
@@ -359,7 +365,9 @@ void keyInputs(unsigned char key, int xmouse, int ymouse)
 	print(matScale);
 	std::cout << "\nTranslation Matrix";
 	print(matTranslate);
-	matSTR = (matSTR * matScale * matTranslate);
+	std::cout << "\Rotation Matrix";
+	print(matRotate);
+	matSTR = (matSTR * matScale * matTranslate * matRotate);
 	std::cout << "\nSTR Final Matrix";
 	print(matSTR);
 	std::cout << "\n" << endl;
@@ -369,9 +377,9 @@ void keyInputs(unsigned char key, int xmouse, int ymouse)
 void init()
 {
 	// Create 3 vertices that make up a triangle that fits on the viewport 
-	GLfloat vertices[] = {-1.0f, -1.0f, 0.0f,
-			1.0f, -1.0f, 0.0f,
-			0.0f, 1.0f, 0.0f};
+	GLfloat vertices[] = {-0.6f, -0.6f, 0.0f,
+			0.6f, -0.6f, 0.0f,
+			0.0f, 0.6f, 0.0f};
 	// Create a color array that identfies the colors of each vertex (format R, G, B, A)
 	GLfloat colors[] = {0.0f, 1.0f, 0.0f, 1.0f,
 			1.0f, 0.0f, 0.0f, 1.0f,

@@ -13,11 +13,9 @@ mat4 matId = identity_mat4();
 mat4 matScale = identity_mat4();
 mat4 matTranslate = identity_mat4();
 mat4 matRotate = identity_mat4();
-mat4 matRotateX = identity_mat4();
-mat4 matRotateY = identity_mat4();
-mat4 matRotateZ = identity_mat4();
 mat4 matSTR = identity_mat4();
 GLint uniform_matid;
+bool debug_mode = true;
 
 // Vertex Shader (for convenience, it is defined in the main here, but we will be using text files for shaders in future)
 // Note: Input to this shader is the vertex positions that we specified for the triangle. 
@@ -225,6 +223,21 @@ void keyInputs(unsigned char key, int xmouse, int ymouse)
 				std::cout << "Scaling on the Z axis on" << std::endl;
 			}
 			break;
+		case('d'):
+			debug_mode = !debug_mode;
+			if (debug_mode == false) {
+				std::cout << "Debug mode off!" << std::endl;
+			}else {
+				std::cout << "Debug mode on!" << std::endl;
+			}
+			break;
+		case('R'):
+			std::cout << "Resetting" << std::endl;
+			matScale = identity_mat4();
+			matTranslate = identity_mat4();
+			matRotate = identity_mat4();
+			matSTR = identity_mat4();
+			break;
 		default:
 			break;
 	}
@@ -295,28 +308,28 @@ void keyInputs(unsigned char key, int xmouse, int ymouse)
 	if (keyArray['t'] == true) {
 		switch (key) {
 			case('1'):
+				std::cout << (debug_mode ? "Translating + X" : "") << std::endl;
 				matTranslate.m[12] = 0.02f;
-				std::cout << "Translating + X" << endl;
 				break;
 			case('2'):
+				std::cout << (debug_mode ? "Translating - X" : "") << std::endl;
 				matTranslate.m[12] = -0.02f;
-				std::cout << "Translating - X" << endl;
 				break;
 			case('3'):
+				std::cout << (debug_mode ? "Translating + Y" : "") << std::endl;
 				matTranslate.m[13] = 0.02f;
-				std::cout << "Translating + Y" << endl;
 				break;
 			case('4'):
+				std::cout << (debug_mode ? "Translating - Y" : "") << std::endl;
 				matTranslate.m[13] = -0.02f;
-				std::cout << "Translating - Y" << endl;
 				break;
 			case('5'):
+				std::cout << (debug_mode ? "Translating + Z" : "") << std::endl;
 				matTranslate.m[14] = 0.02f;
-				std::cout << "Translating + Z" << endl;
 				break;
 			case('6'):
+				std::cout << (debug_mode ? "Translating - Z" : "") << std::endl;
 				matTranslate.m[14] = -0.02f;
-				std::cout << "Translating - Z" << endl;
 				break;
 			default:
 				break;
@@ -326,27 +339,27 @@ void keyInputs(unsigned char key, int xmouse, int ymouse)
 	if (keyArray['r'] == true) {
 		switch (key) {
 			case('1'):
-				std::cout << "Rotating + X, 1 degree" << endl;
+				std::cout << (debug_mode ? "Rotating + X, 1 degree" : "") << std::endl;
 				matRotate = rotate_x_deg(matRotate, 1);
 				break;
 			case('2'):
-				std::cout << "Rotating - X, 1 degree" << endl;
+				std::cout << (debug_mode ? "Rotating - X, 1 degree" : "") << std::endl;
 				matRotate = rotate_x_deg(matRotate, -1);
 				break;
 			case('3'):
-				std::cout << "Rotating + Y, 1 degree" << endl;
+				std::cout << (debug_mode ? "Rotating + Y, 1 degree" : "") << std::endl;
 				matRotate = rotate_y_deg(matRotate, 1);
 				break;
 			case('4'):
-				std::cout << "Rotating - Y, 1 degree" << endl;
+				std::cout << (debug_mode ? "Rotating - Y, 1 degree" : "") << std::endl;
 				matRotate = rotate_y_deg(matRotate, -1);
 				break;
 			case('5'):
-				std::cout << "Rotating + Z, 1 degree" << endl;
+				std::cout << (debug_mode ? "Rotating + Z, 1 degree" : "") << std::endl;
 				matRotate = rotate_z_deg(matRotate, 1);
 				break;
 			case('6'):
-				std::cout << "Rotating - Z, 1 degree" << endl;
+				std::cout << (debug_mode ? "Rotating - Z, 1 degree" : "") << std::endl;
 				matRotate = rotate_z_deg(matRotate, -1);
 				break;
 			default:
@@ -359,18 +372,18 @@ void keyInputs(unsigned char key, int xmouse, int ymouse)
 //		
 //	}
 	// Debug messages/prints of matrices
-	std::cout << "\nSTR Matrix Before";
-	print(matSTR);
-	std::cout << "\nScale Matrix";
-	print(matScale);
-	std::cout << "\nTranslation Matrix";
-	print(matTranslate);
-	std::cout << "\Rotation Matrix";
-	print(matRotate);
 	matSTR = (matSTR * matScale * matTranslate * matRotate);
-	std::cout << "\nSTR Final Matrix";
-	print(matSTR);
-	std::cout << "\n" << endl;
+	if( debug_mode == true){
+		std::cout << "\nScale Matrix";
+		print(matScale);
+		std::cout << "\nTranslation Matrix";
+		print(matTranslate);
+		std::cout << "\Rotation Matrix";
+		print(matRotate);
+		std::cout << "\nSTR Final Matrix";
+		print(matSTR);
+		std::cout << "\n" << endl;
+	}
 	glUniformMatrix4fv(uniform_matid, 1, GL_FALSE, matSTR.m);
 }
 

@@ -30,6 +30,10 @@ int height = 600.0;
 GLuint vertex_position_location;
 GLuint vertex_normals_location;
 
+// Model Matrices
+mat4 model_bl = identity_mat4();
+mat4 model_tl = rotate_x_deg(identity_mat4(), 90);
+
 // Shader Functions- click on + to expand
 #pragma region SHADER_FUNCTIONS
 
@@ -176,10 +180,9 @@ void display(){
 	// bottom-left
 	mat4 view_bl = translate (identity_mat4 (), vec3 (0.0, 0.0, -40.0));
 	mat4 persp_proj_bl = perspective(45.0, (float)width/(float)height, 0.1, 100.0);
-	mat4 model_bl = rotate_z_deg (identity_mat4 (), 45);
+	model_bl = rotate_y_deg (model_bl, 0.05);
 
-	glViewport (0, 0, width/2, height/
-		2);
+	glViewport (0, 0, width/2, height/2);
 	glUniformMatrix4fv (proj_mat_location, 1, GL_FALSE, persp_proj_bl.m);
 	glUniformMatrix4fv (view_mat_location, 1, GL_FALSE, view_bl.m);
 	glUniformMatrix4fv (matrix_location, 1, GL_FALSE, model_bl.m);
@@ -199,13 +202,14 @@ void display(){
 	// top-left
 	mat4 view_tl = translate(identity_mat4(), vec3(0.0, 0.0, -40.0));
 	mat4 persp_proj_tl = perspective(45.0, (float)width / (float)height, 0.1, 100.0);
-	mat4 model_tl = rotate_z_deg(identity_mat4(), 45);
+	model_tl = rotate_z_deg(model_tl, 0.05);
 
 	glViewport(0, height/2, width/2, height/2);
 	glUniformMatrix4fv(proj_mat_location, 1, GL_FALSE, persp_proj_tl.m);
 	glUniformMatrix4fv(view_mat_location, 1, GL_FALSE, view_tl.m);
 	glUniformMatrix4fv(matrix_location, 1, GL_FALSE, model_tl.m);
 	glDrawArrays(GL_TRIANGLES, 0, teapot_vertex_count);
+
 	// top-right
 	mat4 view_tr = translate(identity_mat4(), vec3(0.0, 0.0, -40.0));
 	mat4 persp_proj_tr = perspective(45.0, (float)width / (float)height, 0.1, 100.0);
@@ -229,7 +233,6 @@ void updateScene() {
 	if (delta > 0.03f)
 		delta = 0.03f;
 	last_time = curr_time;
-
 	// Draw the next frame
 	glutPostRedisplay();
 }

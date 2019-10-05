@@ -9,16 +9,24 @@
 using namespace std;
 
 bool keyArray[127];
+
+// Triangle rotation/scaling/translation
 mat4 matId = identity_mat4();
 mat4 matScale = identity_mat4();
 mat4 matTranslate = identity_mat4();
 mat4 matRotate = identity_mat4();
-mat4 matSTR_1 = identity_mat4();
-mat4 matSTR_2 = identity_mat4();
-mat4 matSTR_3 = identity_mat4();
-GLint uniform_matid_1;
-GLint uniform_matid_2;
-GLint uniform_matid_3;
+mat4 matRotate_R = identity_mat4();
+mat4 matRotate_G = identity_mat4();
+mat4 matRotate_B = identity_mat4();
+// Multiple triangle variables
+mat4 matSTR_R = identity_mat4();
+mat4 matSTR_G = identity_mat4();
+mat4 matSTR_B = identity_mat4();
+char triangle_id;
+GLint uniform_matid_R;
+GLint uniform_matid_G;
+GLint uniform_matid_B;
+
 bool debug_mode = true;
 vec3 vPosition;
 
@@ -33,19 +41,19 @@ in vec3 vPosition;													 \n\
 in vec4 vColor;														 \n\
 in int gl_VertexID;                                                  \n\
 out vec4 color;														 \n\
-uniform mat4 matScTrRo_1;                                            \n\
-uniform mat4 matScTrRo_2;                                            \n\
-uniform mat4 matScTrRo_3;                                            \n\
+uniform mat4 matScTrRo_R;                                            \n\
+uniform mat4 matScTrRo_G;                                            \n\
+uniform mat4 matScTrRo_B;                                            \n\
                                                                      \n\
                                                                      \n\
 void main()                                                          \n\
 {                                                                    \n\
 	if(gl_VertexID >= 0 && gl_VertexID <=2){                         \n\
-		gl_Position = matScTrRo_1 * vec4(vPosition.x, vPosition.y, vPosition.z, 1.0);  \n\
+		gl_Position = matScTrRo_R * vec4(vPosition.x, vPosition.y, vPosition.z, 1.0);  \n\
 	}else if(gl_VertexID>=3 && gl_VertexID <=5){					 \n\
-		gl_Position = matScTrRo_2 * vec4(vPosition.x, vPosition.y, vPosition.z, 1.0);  \n\
+		gl_Position = matScTrRo_G * vec4(vPosition.x, vPosition.y, vPosition.z, 1.0);  \n\
 	}else if(gl_VertexID>=6 && gl_VertexID <=8){					\n\
-		gl_Position = matScTrRo_3 * vec4(vPosition.x, vPosition.y, vPosition.z, 1.0);  \n\
+		gl_Position = matScTrRo_B * vec4(vPosition.x, vPosition.y, vPosition.z, 1.0);  \n\
 	}                                                                \n\
 	color = vColor;							                         \n\
 }";
@@ -243,12 +251,29 @@ void keyInputs(unsigned char key, int xmouse, int ymouse)
 				std::cout << "Debug mode on!" << std::endl;
 			}
 			break;
+		case('g'):
+			std::cout << "Green Triangle" << std::endl;
+			triangle_id = 'g';
+			break;
+		case('b'):
+			std::cout << "Blue Triangle" << std::endl;
+			triangle_id = 'b';
+			break;
+		case('o'):
+			std::cout << "Red Triangle" << std::endl;
+			triangle_id = 'r';
+			break;
 		case('R'):
 			std::cout << "Resetting" << std::endl;
 			matScale = identity_mat4();
 			matTranslate = identity_mat4();
 			matRotate = identity_mat4();
-			matSTR_1 = identity_mat4();
+			matRotate_R = identity_mat4();
+			matRotate_G = identity_mat4();
+			matRotate_B = identity_mat4();
+			matSTR_R = identity_mat4();
+			matSTR_G = identity_mat4();
+			matSTR_B = identity_mat4();
 			break;
 		default:
 			break;
@@ -261,11 +286,11 @@ void keyInputs(unsigned char key, int xmouse, int ymouse)
 			switch (key) {
 				case('+'):
 					std::cout << "Scaling up X, Y, Z\n" << endl;
-					matScale = scale(matId, vec3(2.0f, 2.0f, 2.0f));
+					matScale = scale(identity_mat4(), vec3(2.0f, 2.0f, 2.0f));
 					break;
 				case('-'):
 					std::cout << "Scaling down X, Y, Z\n" << endl;
-					matScale = scale(matId, vec3(0.5f, 0.5f, 0.5f));
+					matScale = scale(identity_mat4(), vec3(0.5f, 0.5f, 0.5f));
 					break;
 				default:
 					break;
@@ -275,11 +300,11 @@ void keyInputs(unsigned char key, int xmouse, int ymouse)
 			switch (key) {
 				case('+'):
 					std::cout << "Scaling up X\n" << endl;
-					matScale = scale(matId, vec3(2.0f, 1.0f, 1.0f));
+					matScale = scale(identity_mat4(), vec3(2.0f, 1.0f, 1.0f));
 					break;
 				case('-'):
 					std::cout << "Scaling down X\n" << endl;
-					matScale = scale(matId, vec3(0.5f, 1.0f, 1.0f));
+					matScale = scale(identity_mat4(), vec3(0.5f, 1.0f, 1.0f));
 					break;
 				default:
 					break;
@@ -289,11 +314,11 @@ void keyInputs(unsigned char key, int xmouse, int ymouse)
 			switch (key) {
 				case('+'):
 					std::cout << "Scaling up Y\n" << endl;
-					matScale = scale(matId, vec3(1.0f, 2.0f, 1.0f));
+					matScale = scale(identity_mat4(), vec3(1.0f, 2.0f, 1.0f));
 					break;
 				case('-'):
 					std::cout << "Scaling down Y\n" << endl;
-					matScale = scale(matId, vec3(1.0f, 0.5f, 1.0f));
+					matScale = scale(identity_mat4(), vec3(1.0f, 0.5f, 1.0f));
 					break;
 				default:
 					break;
@@ -303,11 +328,11 @@ void keyInputs(unsigned char key, int xmouse, int ymouse)
 			switch (key) {
 			case('+'):
 				std::cout << "Scaling up Z\n" << endl;
-				matScale = scale(matId, vec3(1.0f, 1.0f, 2.0f));
+				matScale = scale(identity_mat4(), vec3(1.0f, 1.0f, 2.0f));
 				break;
 			case('-'):
 				std::cout << "Scaling down Z\n" << endl;
-				matScale = scale(matId, vec3(1.0f, 1.0f, 0.5f));
+				matScale = scale(identity_mat4(), vec3(1.0f, 1.0f, 0.5f));
 				break;
 			default:
 				break;
@@ -349,6 +374,17 @@ void keyInputs(unsigned char key, int xmouse, int ymouse)
 	}
 	
 	if (keyArray['r'] == true) {
+		// Assigning initial rotation matrix variable
+		if (triangle_id == 'r') {
+			matRotate = matRotate_R;
+		}
+		else if (triangle_id == 'g') {
+			matRotate = matRotate_G;
+		}
+		else if (triangle_id == 'b') {
+			matRotate = matRotate_B;
+		}
+		// Rotating based on input
 		switch (key) {
 			case('1'):
 				std::cout << (debug_mode ? "Rotating + X, 1 degree" : "") << std::endl;
@@ -377,6 +413,16 @@ void keyInputs(unsigned char key, int xmouse, int ymouse)
 			default:
 				break;
 		}
+		if (triangle_id == 'r') {
+			matRotate_R = matRotate;
+		}
+		else if (triangle_id == 'g') {
+			matRotate_G = matRotate;
+		}
+		else if (triangle_id == 'b') {
+			matRotate_B = matRotate;
+		}
+		matRotate = identity_mat4();
 	}
 	// Rotation
 //	matRotate = identity_mat4();
@@ -384,7 +430,15 @@ void keyInputs(unsigned char key, int xmouse, int ymouse)
 //		
 //	}
 	// Debug messages/prints of matrices
-	matSTR_1= (matSTR_1* matScale * matTranslate * matRotate);
+	if (triangle_id == 'r') {
+		matSTR_R = (matSTR_R * matScale * matTranslate * matRotate_R);
+	}
+	else if (triangle_id == 'g') {
+		matSTR_G = (matSTR_G * matScale * matTranslate * matRotate_G);
+	}
+	else if (triangle_id == 'b') {
+		matSTR_B = (matSTR_B * matScale * matTranslate * matRotate_B);
+	}
 	if( debug_mode == true){
 		std::cout << "\nScale Matrix";
 		print(matScale);
@@ -393,42 +447,44 @@ void keyInputs(unsigned char key, int xmouse, int ymouse)
 		std::cout << "\Rotation Matrix";
 		print(matRotate);
 		std::cout << "\nSTR Final Matrix";
-		print(matSTR_1);
+		print(matSTR_R);
 		std::cout << "\n" << endl;
 	}
-	glUniformMatrix4fv(uniform_matid_1, 1, GL_FALSE, matSTR_1.m);
-	glUniformMatrix4fv(uniform_matid_2, 1, GL_FALSE, matSTR_2.m);
-	glUniformMatrix4fv(uniform_matid_3, 1, GL_FALSE, matSTR_3.m);
+	glUniformMatrix4fv(uniform_matid_R, 1, GL_FALSE, matSTR_R.m);
+	glUniformMatrix4fv(uniform_matid_G, 1, GL_FALSE, matSTR_G.m);
+	glUniformMatrix4fv(uniform_matid_B, 1, GL_FALSE, matSTR_B.m);
 }
 
 void init()
 {
 	// Create 3 vertices that make up a triangle that fits on the viewport 
 	GLfloat vertices[] = {
-						  // Triangle 1
+						  // Red Triangle
 						  -0.5f, 0.0f, 0.0f,
 						   0.5f, 0.0f, 0.0f,
 						   0.0f, 1.0f, 0.0f,
-						   // Triangle 2
-						  -1.0f, -1.0f, 0.0f,
-						   0.0f, -1.0f, 0.0f,
-						  -0.5f, 0.0f, 0.0f,
-						  // Triangle 3
+						  // Green Triangle
 						  -0.0f, -1.0f, 0.0f,
 						   1.0f, -1.0f, 0.0f,
 						   0.5f,  0.0f, 0.0f,
+						   // Blue Triangle
+						  -1.0f, -1.0f, 0.0f,
+						   0.0f, -1.0f, 0.0f,
+						  -0.5f, 0.0f, 0.0f
+
 	};
 
 	// Create a color array that identfies the colors of each vertex (format R, G, B, A)
 	GLfloat colors[] = {1.0f, 0.0f, 0.0f, 1.0f,
 						1.0f, 0.0f, 0.0f, 1.0f,
 						1.0f, 0.0f, 0.0f, 1.0f,
-						0.0f, 0.0f, 1.0f, 1.0f,
-						0.0f, 0.0f, 1.0f, 1.0f,
-						0.0f, 0.0f, 1.0f, 1.0f,
 						0.0f, 1.0f, 0.0f, 1.0f,
 						0.0f, 1.0f, 0.0f, 1.0f,
-						0.0f, 1.0f, 0.0f, 1.0f};
+						0.0f, 1.0f, 0.0f, 1.0f,
+						0.0f, 0.0f, 1.0f, 1.0f,
+						0.0f, 0.0f, 1.0f, 1.0f,
+						0.0f, 0.0f, 1.0f, 1.0f
+};
 	GLint numVertices = 9;
 	// Set up the shaders
 	GLuint shaderProgramID = CompileShaders();
@@ -437,12 +493,12 @@ void init()
 	// Link the current buffer to the shader
 	linkCurrentBuffertoShader(shaderProgramID, numVertices);
 	// Link Matrix to Shader
-	uniform_matid_1 = glGetUniformLocation(shaderProgramID, "matScTrRo_1");
-	glUniformMatrix4fv(uniform_matid_1, 1, GL_FALSE, matSTR_1.m);
-	uniform_matid_2 = glGetUniformLocation(shaderProgramID, "matScTrRo_2");
-	glUniformMatrix4fv(uniform_matid_2, 1, GL_FALSE, matSTR_2.m);
-	uniform_matid_3 = glGetUniformLocation(shaderProgramID, "matScTrRo_3");
-	glUniformMatrix4fv(uniform_matid_3, 1, GL_FALSE, matSTR_3.m);
+	uniform_matid_R = glGetUniformLocation(shaderProgramID, "matScTrRo_R");
+	glUniformMatrix4fv(uniform_matid_R, 1, GL_FALSE, matSTR_R.m);
+	uniform_matid_G = glGetUniformLocation(shaderProgramID, "matScTrRo_G");
+	glUniformMatrix4fv(uniform_matid_G, 1, GL_FALSE, matSTR_G.m);
+	uniform_matid_B = glGetUniformLocation(shaderProgramID, "matScTrRo_B");
+	glUniformMatrix4fv(uniform_matid_B, 1, GL_FALSE, matSTR_B.m);
 
 }
 

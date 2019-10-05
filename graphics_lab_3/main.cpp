@@ -27,8 +27,8 @@ GLuint shaderProgramID;
 unsigned int teapot_vao = 0;
 int width = 800.0;
 int height = 600.0;
-GLuint loc1;
-GLuint loc2;
+GLuint vertex_position_location;
+GLuint vertex_normals_location;
 
 // Shader Functions- click on + to expand
 #pragma region SHADER_FUNCTIONS
@@ -125,15 +125,11 @@ GLuint CompileShaders()
 // VBO Functions - click on + to expand
 #pragma region VBO_FUNCTIONS
 
-
-
-
-
 void generateObjectBufferTeapot () {
 	GLuint vp_vbo = 0;
 
-	loc1 = glGetAttribLocation(shaderProgramID, "vertex_position");
-	loc2 = glGetAttribLocation(shaderProgramID, "vertex_normals");
+	vertex_position_location = glGetAttribLocation(shaderProgramID, "vertex_position");
+	vertex_normals_location = glGetAttribLocation(shaderProgramID, "vertex_normals");
 	
 	glGenBuffers (1, &vp_vbo);
 	glBindBuffer (GL_ARRAY_BUFFER, vp_vbo);
@@ -146,12 +142,12 @@ void generateObjectBufferTeapot () {
 	glGenVertexArrays (1, &teapot_vao);
 	glBindVertexArray (teapot_vao);
 
-	glEnableVertexAttribArray (loc1);
+	glEnableVertexAttribArray (vertex_position_location);
 	glBindBuffer (GL_ARRAY_BUFFER, vp_vbo);
-	glVertexAttribPointer (loc1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-	glEnableVertexAttribArray (loc2);
+	glVertexAttribPointer (vertex_position_location, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+	glEnableVertexAttribArray (vertex_normals_location);
 	glBindBuffer (GL_ARRAY_BUFFER, vn_vbo);
-	glVertexAttribPointer (loc2, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+	glVertexAttribPointer (vertex_normals_location, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 }
 
 
@@ -178,22 +174,48 @@ void display(){
 	//The model transform rotates the object by 45 degrees, the view transform sets the camera at -40 on the z-axis, and the perspective projection is setup using Antons method
 
 	// bottom-left
-	mat4 view = translate (identity_mat4 (), vec3 (0.0, 0.0, -40.0));
-	mat4 persp_proj = perspective(45.0, (float)width/(float)height, 0.1, 100.0);
-	mat4 model = rotate_z_deg (identity_mat4 (), 45);
+	mat4 view_bl = translate (identity_mat4 (), vec3 (0.0, 0.0, -40.0));
+	mat4 persp_proj_bl = perspective(45.0, (float)width/(float)height, 0.1, 100.0);
+	mat4 model_bl = rotate_z_deg (identity_mat4 (), 45);
 
-	glViewport (0, 0, width / 2, height / 2);
-	glUniformMatrix4fv (proj_mat_location, 1, GL_FALSE, persp_proj.m);
-	glUniformMatrix4fv (view_mat_location, 1, GL_FALSE, view.m);
-	glUniformMatrix4fv (matrix_location, 1, GL_FALSE, model.m);
+	glViewport (0, 0, width/2, height/
+		2);
+	glUniformMatrix4fv (proj_mat_location, 1, GL_FALSE, persp_proj_bl.m);
+	glUniformMatrix4fv (view_mat_location, 1, GL_FALSE, view_bl.m);
+	glUniformMatrix4fv (matrix_location, 1, GL_FALSE, model_bl.m);
 	glDrawArrays (GL_TRIANGLES, 0, teapot_vertex_count);
 
 	// bottom-right
-		
+	mat4 view_br = translate(identity_mat4(), vec3(0.0, 0.0, -40.0));
+	mat4 persp_proj_br = perspective(45.0, (float)width / (float)height, 0.1, 100.0);
+	mat4 model_br = rotate_z_deg(identity_mat4(), 45);
+
+	glViewport(width/2, 0, width/2, height/2);
+	glUniformMatrix4fv(proj_mat_location, 1, GL_FALSE, persp_proj_br.m);
+	glUniformMatrix4fv(view_mat_location, 1, GL_FALSE, view_br.m);
+	glUniformMatrix4fv(matrix_location, 1, GL_FALSE, model_br.m);
+	glDrawArrays(GL_TRIANGLES, 0, teapot_vertex_count);
+
 	// top-left
+	mat4 view_tl = translate(identity_mat4(), vec3(0.0, 0.0, -40.0));
+	mat4 persp_proj_tl = perspective(45.0, (float)width / (float)height, 0.1, 100.0);
+	mat4 model_tl = rotate_z_deg(identity_mat4(), 45);
 
+	glViewport(0, height/2, width/2, height/2);
+	glUniformMatrix4fv(proj_mat_location, 1, GL_FALSE, persp_proj_tl.m);
+	glUniformMatrix4fv(view_mat_location, 1, GL_FALSE, view_tl.m);
+	glUniformMatrix4fv(matrix_location, 1, GL_FALSE, model_tl.m);
+	glDrawArrays(GL_TRIANGLES, 0, teapot_vertex_count);
 	// top-right
+	mat4 view_tr = translate(identity_mat4(), vec3(0.0, 0.0, -40.0));
+	mat4 persp_proj_tr = perspective(45.0, (float)width / (float)height, 0.1, 100.0);
+	mat4 model_tr = rotate_z_deg(identity_mat4(), 45);
 
+	glViewport(width/2, height/2, width/2, height/2);
+	glUniformMatrix4fv(proj_mat_location, 1, GL_FALSE, persp_proj_tr.m);
+	glUniformMatrix4fv(view_mat_location, 1, GL_FALSE, view_tr.m);
+	glUniformMatrix4fv(matrix_location, 1, GL_FALSE, model_tr.m);
+	glDrawArrays(GL_TRIANGLES, 0, teapot_vertex_count);
     glutSwapBuffers();
 }
 
@@ -215,19 +237,11 @@ void updateScene() {
 
 void init()
 {
-	// Create 3 vertices that make up a triangle that fits on the viewport 
-	GLfloat vertices[] = {-1.0f, -1.0f, 0.0f, 1.0,
-			1.0f, -1.0f, 0.0f, 1.0, 
-			0.0f, 1.0f, 0.0f, 1.0};
-	// Create a color array that identfies the colors of each vertex (format R, G, B, A)
-	GLfloat colors[] = {0.0f, 1.0f, 0.0f, 1.0f,
-			1.0f, 0.0f, 0.0f, 1.0f,
-			0.0f, 0.0f, 1.0f, 1.0f};
 	// Set up the shaders
 	GLuint shaderProgramID = CompileShaders();
 
 	// load teapot mesh into a vertex buffer array
-	generateObjectBufferTeapot ();
+	generateObjectBufferTeapot();
 	
 }
 

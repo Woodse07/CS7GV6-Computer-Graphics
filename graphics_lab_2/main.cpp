@@ -40,10 +40,12 @@ uniform mat4 matScTrRo_3;                                            \n\
                                                                      \n\
 void main()                                                          \n\
 {                                                                    \n\
-	if(gl_VertexID <=2){                                             \n\
+	if(gl_VertexID >= 0 && gl_VertexID <=2){                         \n\
 		gl_Position = matScTrRo_1 * vec4(vPosition.x, vPosition.y, vPosition.z, 1.0);  \n\
-	}else{															 \n\
-		gl_Position = vec4(vPosition.x, vPosition.y, vPosition.z, 1.0);  \n\
+	}else if(gl_VertexID>=3 && gl_VertexID <=5){					 \n\
+		gl_Position = matScTrRo_2 * vec4(vPosition.x, vPosition.y, vPosition.z, 1.0);  \n\
+	}else if(gl_VertexID>=6 && gl_VertexID <=8){					\n\
+		gl_Position = matScTrRo_3 * vec4(vPosition.x, vPosition.y, vPosition.z, 1.0);  \n\
 	}                                                                \n\
 	color = vColor;							                         \n\
 }";
@@ -439,7 +441,7 @@ void init()
 	glUniformMatrix4fv(uniform_matid_1, 1, GL_FALSE, matSTR_1.m);
 	uniform_matid_2 = glGetUniformLocation(shaderProgramID, "matScTrRo_2");
 	glUniformMatrix4fv(uniform_matid_2, 1, GL_FALSE, matSTR_2.m);
-	uniform_matid_3 = glGetUniformLocation(shaderProgramID, "matScTrRo_2");
+	uniform_matid_3 = glGetUniformLocation(shaderProgramID, "matScTrRo_3");
 	glUniformMatrix4fv(uniform_matid_3, 1, GL_FALSE, matSTR_3.m);
 
 }

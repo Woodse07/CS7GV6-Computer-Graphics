@@ -13,9 +13,14 @@ mat4 matId = identity_mat4();
 mat4 matScale = identity_mat4();
 mat4 matTranslate = identity_mat4();
 mat4 matRotate = identity_mat4();
-mat4 matSTR = identity_mat4();
-GLint uniform_matid;
+mat4 matSTR_1 = identity_mat4();
+mat4 matSTR_2 = identity_mat4();
+mat4 matSTR_3 = identity_mat4();
+GLint uniform_matid_1;
+GLint uniform_matid_2;
+GLint uniform_matid_3;
 bool debug_mode = true;
+vec3 vPosition;
 
 // Vertex Shader (for convenience, it is defined in the main here, but we will be using text files for shaders in future)
 // Note: Input to this shader is the vertex positions that we specified for the triangle. 
@@ -26,26 +31,33 @@ static const char* pVS = "                                           \n\
                                                                      \n\
 in vec3 vPosition;													 \n\
 in vec4 vColor;														 \n\
+in int gl_VertexID;                                                  \n\
 out vec4 color;														 \n\
-uniform mat4 matScTrRo;                                              \n\
+uniform mat4 matScTrRo_1;                                            \n\
+uniform mat4 matScTrRo_2;                                            \n\
+uniform mat4 matScTrRo_3;                                            \n\
                                                                      \n\
                                                                      \n\
 void main()                                                          \n\
 {                                                                    \n\
-    gl_Position = matScTrRo * vec4(vPosition.x, vPosition.y, vPosition.z, 1.0);  \n\
+	if(gl_VertexID <=2){                                             \n\
+		gl_Position = matScTrRo_1 * vec4(vPosition.x, vPosition.y, vPosition.z, 1.0);  \n\
+	}else{															 \n\
+		gl_Position = vec4(vPosition.x, vPosition.y, vPosition.z, 1.0);  \n\
+	}                                                                \n\
 	color = vColor;							                         \n\
 }";
 
 // Fragment Shader
 // Note: no input in this shader, it just outputs the colour of all fragments, in this case set to red (format: R, G, B, A).
-static const char* pFS = "                  \n\
-#version 330                                \n\
-                                            \n\
-out vec4 FragColor;                         \n\
-                                            \n\
-void main()                                 \n\
-{                                           \n\
-    FragColor = vec4(0.0, 1.0, 0.0, 1.0);	\n\
+static const char* pFS = "  \n\
+#version 330                \n\
+in vec4 color;				\n\
+out vec4 FragColor;			\n\
+                            \n\
+void main()                 \n\
+{                           \n\
+    FragColor = color;		\n\
 }";
 
 // Shader Functions- click on + to expand
@@ -122,8 +134,7 @@ GLuint CompileShaders()
 
 // VBO Functions - click on + to expand
 #pragma region VBO_FUNCTIONS
-GLuint generateObjectBuffer(GLfloat vertices[], GLfloat colors[]) {
-	GLuint numVertices = 3;
+GLuint generateObjectBuffer(GLfloat vertices[], GLfloat colors[], GLint numVertices) {
 	// Genderate 1 generic buffer object, called VBO
 	GLuint VBO;
  	glGenBuffers(1, &VBO);
@@ -138,8 +149,7 @@ GLuint generateObjectBuffer(GLfloat vertices[], GLfloat colors[]) {
 return VBO;
 }
 
-void linkCurrentBuffertoShader(GLuint shaderProgramID){
-	GLuint numVertices = 3;
+void linkCurrentBuffertoShader(GLuint shaderProgramID, GLint numVertices){
 	// find the location of the variables that we will be using in the shader program
 	GLuint positionID = glGetAttribLocation(shaderProgramID, "vPosition");
 	GLuint colorID = glGetAttribLocation(shaderProgramID, "vColor");
@@ -157,7 +167,7 @@ void linkCurrentBuffertoShader(GLuint shaderProgramID){
 void display(){
 	glClear(GL_COLOR_BUFFER_BIT);
 	// NB: Make the call to draw the geometry in the currently activated vertex buffer. This is where the GPU starts to work!
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glDrawArrays(GL_TRIANGLES, 0, 9);
     glutSwapBuffers();
 	glutPostRedisplay();
 }
@@ -236,7 +246,7 @@ void keyInputs(unsigned char key, int xmouse, int ymouse)
 			matScale = identity_mat4();
 			matTranslate = identity_mat4();
 			matRotate = identity_mat4();
-			matSTR = identity_mat4();
+			matSTR_1 = identity_mat4();
 			break;
 		default:
 			break;
@@ -372,7 +382,7 @@ void keyInputs(unsigned char key, int xmouse, int ymouse)
 //		
 //	}
 	// Debug messages/prints of matrices
-	matSTR = (matSTR * matScale * matTranslate * matRotate);
+	matSTR_1= (matSTR_1* matScale * matTranslate * matRotate);
 	if( debug_mode == true){
 		std::cout << "\nScale Matrix";
 		print(matScale);
@@ -381,31 +391,56 @@ void keyInputs(unsigned char key, int xmouse, int ymouse)
 		std::cout << "\Rotation Matrix";
 		print(matRotate);
 		std::cout << "\nSTR Final Matrix";
-		print(matSTR);
+		print(matSTR_1);
 		std::cout << "\n" << endl;
 	}
-	glUniformMatrix4fv(uniform_matid, 1, GL_FALSE, matSTR.m);
+	glUniformMatrix4fv(uniform_matid_1, 1, GL_FALSE, matSTR_1.m);
+	glUniformMatrix4fv(uniform_matid_2, 1, GL_FALSE, matSTR_2.m);
+	glUniformMatrix4fv(uniform_matid_3, 1, GL_FALSE, matSTR_3.m);
 }
 
 void init()
 {
 	// Create 3 vertices that make up a triangle that fits on the viewport 
-	GLfloat vertices[] = {-0.6f, -0.6f, 0.0f,
-			0.6f, -0.6f, 0.0f,
-			0.0f, 0.6f, 0.0f};
+	GLfloat vertices[] = {
+						  // Triangle 1
+						  -0.5f, 0.0f, 0.0f,
+						   0.5f, 0.0f, 0.0f,
+						   0.0f, 1.0f, 0.0f,
+						   // Triangle 2
+						  -1.0f, -1.0f, 0.0f,
+						   0.0f, -1.0f, 0.0f,
+						  -0.5f, 0.0f, 0.0f,
+						  // Triangle 3
+						  -0.0f, -1.0f, 0.0f,
+						   1.0f, -1.0f, 0.0f,
+						   0.5f,  0.0f, 0.0f,
+	};
+
 	// Create a color array that identfies the colors of each vertex (format R, G, B, A)
-	GLfloat colors[] = {0.0f, 1.0f, 0.0f, 1.0f,
-			1.0f, 0.0f, 0.0f, 1.0f,
-			0.0f, 0.0f, 1.0f, 1.0f};
+	GLfloat colors[] = {1.0f, 0.0f, 0.0f, 1.0f,
+						1.0f, 0.0f, 0.0f, 1.0f,
+						1.0f, 0.0f, 0.0f, 1.0f,
+						0.0f, 0.0f, 1.0f, 1.0f,
+						0.0f, 0.0f, 1.0f, 1.0f,
+						0.0f, 0.0f, 1.0f, 1.0f,
+						0.0f, 1.0f, 0.0f, 1.0f,
+						0.0f, 1.0f, 0.0f, 1.0f,
+						0.0f, 1.0f, 0.0f, 1.0f};
+	GLint numVertices = 9;
 	// Set up the shaders
 	GLuint shaderProgramID = CompileShaders();
 	// Put the vertices and colors into a vertex buffer object
-	generateObjectBuffer(vertices, colors);
+	generateObjectBuffer(vertices, colors, numVertices);
 	// Link the current buffer to the shader
-	linkCurrentBuffertoShader(shaderProgramID);
+	linkCurrentBuffertoShader(shaderProgramID, numVertices);
 	// Link Matrix to Shader
-	uniform_matid = glGetUniformLocation(shaderProgramID, "matScTrRo");
-	glUniformMatrix4fv(uniform_matid, 1, GL_FALSE, matSTR.m);
+	uniform_matid_1 = glGetUniformLocation(shaderProgramID, "matScTrRo_1");
+	glUniformMatrix4fv(uniform_matid_1, 1, GL_FALSE, matSTR_1.m);
+	uniform_matid_2 = glGetUniformLocation(shaderProgramID, "matScTrRo_2");
+	glUniformMatrix4fv(uniform_matid_2, 1, GL_FALSE, matSTR_2.m);
+	uniform_matid_3 = glGetUniformLocation(shaderProgramID, "matScTrRo_2");
+	glUniformMatrix4fv(uniform_matid_3, 1, GL_FALSE, matSTR_3.m);
 
 }
 

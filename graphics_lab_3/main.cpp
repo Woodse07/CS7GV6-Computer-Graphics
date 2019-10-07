@@ -193,7 +193,7 @@ void display(){
 
 	// bottom-right
 	mat4 view_br = translate(identity_mat4(), vec3(0.0, 0.0, -40.0));
-	mat4 persp_proj_br = perspective(70, (float)width / (float)height, 11.0, 80.0);
+	mat4 persp_proj_br = perspective(75, (float)width / (float)height, 11.0, 80.0);
 	mat4 ortho_br = identity_mat4();
 	mat4 model_br = rotate_x_deg(identity_mat4(), 20.0);
 	model_br = rotate_z_deg(model_br, -20.0);

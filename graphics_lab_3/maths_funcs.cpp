@@ -516,6 +516,7 @@ m n o p
 */
 
 // returns a perspective function mimicing the opengl projection style. COLUMN ORDER
+// Used for 3D worlds, first person rendering and such
 mat4 perspective (float fovy, float aspect, float near, float far) {
 	float fov_rad = fovy * ONE_DEG_IN_RAD;
 	float range = tan (fov_rad / 2.0f) * near;
@@ -531,6 +532,22 @@ mat4 perspective (float fovy, float aspect, float near, float far) {
 	m.m[11] = -1.0f;
 	return m;
 }
+
+
+// returns a perspective matrix
+// Ortho is mostly used for UI, 2D stuff
+mat4 ortho(float left, float right, float bottom, float top, float near, float far) {
+	mat4 m = zero_mat4(); // make sure bottom-right corner is zero
+	m.m[0] = 2/(right-left);
+	m.m[5] = 2 /(top-bottom);
+	m.m[10] = -2 / (far - near);
+	m.m[12] = -((left+right)/(right-left));
+	m.m[13] = -((top + bottom) / (top - bottom));	
+	m.m[14] = -((far+near)/(far-near));
+	m.m[15] = 1;
+	return m;
+}
+
 
 
 /*------------------------------HAMILTON IN DA HOUSE!-----------------------------*/

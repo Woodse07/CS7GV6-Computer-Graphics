@@ -127,6 +127,7 @@ mat4 scale (const mat4& m, const vec3& v);
 // camera functions
 mat4 look_at (const vec3& cam_pos, vec3 targ_pos, const vec3& up);
 mat4 perspective (float fovy, float aspect, float near, float far);
+mat4 ortho(float left, float right, float bottom, float top, float near, float far);
 // quaternion functions
 versor quat_from_axis_rad (float radians, float x, float y, float z);
 versor quat_from_axis_deg (float degrees, float x, float y, float z);

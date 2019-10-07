@@ -172,6 +172,7 @@ void display(){
 	int matrix_location = glGetUniformLocation (shaderProgramID, "model");
 	int view_mat_location = glGetUniformLocation (shaderProgramID, "view");
 	int proj_mat_location = glGetUniformLocation (shaderProgramID, "proj");
+	int ortho_mat_location = glGetUniformLocation(shaderProgramID, "ortho");
 	
 
 	//Here is where the code for the viewport lab will go, to get you started I have drawn a t-pot in the bottom left
@@ -180,45 +181,55 @@ void display(){
 	// bottom-left
 	mat4 view_bl = translate (identity_mat4 (), vec3 (0.0, 0.0, -40.0));
 	mat4 persp_proj_bl = perspective(45.0, (float)width/(float)height, 0.1, 100.0);
+	mat4 ortho_bl = identity_mat4();
 	model_bl = rotate_y_deg (model_bl, 0.05);
 
 	glViewport (0, 0, width/2, height/2);
 	glUniformMatrix4fv (proj_mat_location, 1, GL_FALSE, persp_proj_bl.m);
 	glUniformMatrix4fv (view_mat_location, 1, GL_FALSE, view_bl.m);
 	glUniformMatrix4fv (matrix_location, 1, GL_FALSE, model_bl.m);
+	glUniformMatrix4fv(ortho_mat_location, 1, GL_FALSE, ortho_bl.m);
 	glDrawArrays (GL_TRIANGLES, 0, teapot_vertex_count);
 
 	// bottom-right
 	mat4 view_br = translate(identity_mat4(), vec3(0.0, 0.0, -40.0));
-	mat4 persp_proj_br = perspective(45.0, (float)width / (float)height, 0.1, 100.0);
-	mat4 model_br = rotate_z_deg(identity_mat4(), 45);
+	mat4 persp_proj_br = perspective(70, (float)width / (float)height, 11.0, 80.0);
+	mat4 ortho_br = identity_mat4();
+	mat4 model_br = rotate_x_deg(identity_mat4(), 20.0);
+	model_br = rotate_z_deg(model_br, -20.0);
+	model_br = rotate_y_deg(model_br, -45.0);
 
 	glViewport(width/2, 0, width/2, height/2);
 	glUniformMatrix4fv(proj_mat_location, 1, GL_FALSE, persp_proj_br.m);
 	glUniformMatrix4fv(view_mat_location, 1, GL_FALSE, view_br.m);
 	glUniformMatrix4fv(matrix_location, 1, GL_FALSE, model_br.m);
+	glUniformMatrix4fv(ortho_mat_location, 1, GL_FALSE, ortho_br.m);
 	glDrawArrays(GL_TRIANGLES, 0, teapot_vertex_count);
 
 	// top-left
-	mat4 view_tl = translate(identity_mat4(), vec3(0.0, 0.0, -40.0));
+	mat4 view_tl = translate(identity_mat4(), vec3(0.0, 0.0, -50.0));
 	mat4 persp_proj_tl = perspective(45.0, (float)width / (float)height, 0.1, 100.0);
+	mat4 ortho_tl = ortho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f);
 	model_tl = rotate_z_deg(model_tl, 0.05);
 
 	glViewport(0, height/2, width/2, height/2);
 	glUniformMatrix4fv(proj_mat_location, 1, GL_FALSE, persp_proj_tl.m);
 	glUniformMatrix4fv(view_mat_location, 1, GL_FALSE, view_tl.m);
 	glUniformMatrix4fv(matrix_location, 1, GL_FALSE, model_tl.m);
+	glUniformMatrix4fv(ortho_mat_location, 1, GL_FALSE, ortho_tl.m);
 	glDrawArrays(GL_TRIANGLES, 0, teapot_vertex_count);
 
 	// top-right
 	mat4 view_tr = translate(identity_mat4(), vec3(0.0, 0.0, -40.0));
 	mat4 persp_proj_tr = perspective(45.0, (float)width / (float)height, 0.1, 100.0);
-	mat4 model_tr = rotate_z_deg(identity_mat4(), 45);
+	mat4 ortho_tr = identity_mat4();
+	mat4 model_tr = rotate_z_deg(identity_mat4(), 0);
 
 	glViewport(width/2, height/2, width/2, height/2);
 	glUniformMatrix4fv(proj_mat_location, 1, GL_FALSE, persp_proj_tr.m);
 	glUniformMatrix4fv(view_mat_location, 1, GL_FALSE, view_tr.m);
 	glUniformMatrix4fv(matrix_location, 1, GL_FALSE, model_tr.m);
+	glUniformMatrix4fv(ortho_mat_location, 1, GL_FALSE, ortho_tr.m);
 	glDrawArrays(GL_TRIANGLES, 0, teapot_vertex_count);
     glutSwapBuffers();
 }

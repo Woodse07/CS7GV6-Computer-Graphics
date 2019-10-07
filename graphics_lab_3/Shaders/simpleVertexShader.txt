@@ -8,8 +8,9 @@ out vec3 n_eye;
 uniform mat4 view;
 uniform mat4 proj;
 uniform mat4 model;
+uniform mat4 ortho;
 
 void main(){
 	n_eye = (view * vec4 (vertex_normals, 0.0)).xyz;
-	gl_Position =  proj * view * model * vec4 (vertex_position, 1.0);
+	gl_Position =  proj * view * model * ortho * vec4 (vertex_position, 1.0);
 }

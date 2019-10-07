@@ -194,7 +194,7 @@ void display(){
 	// bottom-right
 	mat4 view_br = translate(identity_mat4(), vec3(0.0, 0.0, -40.0));
 	mat4 persp_proj_br = perspective(75, (float)width / (float)height, 11.0, 80.0);
-	mat4 ortho_br = identity_mat4();
+	mat4 ortho_br = identity_mat4();// ortho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f);
 	mat4 model_br = rotate_x_deg(identity_mat4(), 20.0);
 	model_br = rotate_z_deg(model_br, -20.0);
 	model_br = rotate_y_deg(model_br, -45.0);
@@ -209,7 +209,7 @@ void display(){
 	// top-left
 	mat4 view_tl = translate(identity_mat4(), vec3(0.0, 0.0, -50.0));
 	mat4 persp_proj_tl = perspective(45.0, (float)width / (float)height, 0.1, 100.0);
-	mat4 ortho_tl = ortho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f);
+	mat4 ortho_tl = ortho(-0.7f, 0.7f, -0.7f, 0.7f, -0.7f, 0.7f);
 	model_tl = rotate_z_deg(model_tl, 0.05);
 
 	glViewport(0, height/2, width/2, height/2);
@@ -221,9 +221,11 @@ void display(){
 
 	// top-right
 	mat4 view_tr = translate(identity_mat4(), vec3(0.0, 0.0, -40.0));
-	mat4 persp_proj_tr = perspective(45.0, (float)width / (float)height, 0.1, 100.0);
-	mat4 ortho_tr = identity_mat4();
-	mat4 model_tr = rotate_z_deg(identity_mat4(), 0);
+	mat4 persp_proj_tr = perspective(60.0, (float)width / (float)height, 0.1, 100.0);
+	mat4 ortho_tr = ortho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f);
+	mat4 model_tr = rotate_y_deg(identity_mat4(), 90);
+	mat4 lookat = identity_mat4(); // look_at(vec3(0.0f, 0.0f, -1.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0, 1, 0));
+	model_tr = model_tr * lookat;
 
 	glViewport(width/2, height/2, width/2, height/2);
 	glUniformMatrix4fv(proj_mat_location, 1, GL_FALSE, persp_proj_tr.m);

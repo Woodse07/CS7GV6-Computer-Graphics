@@ -26,8 +26,5 @@
     <ClInclude Include="maths_funcs.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="teapot.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

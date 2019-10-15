@@ -21,6 +21,7 @@ int height = 600;
 
 GLuint loc1;
 GLuint loc2;
+// Rotation variables
 GLfloat rotatez = 0.0f;
 
 
@@ -170,28 +171,64 @@ void display() {
 	mat4 view = identity_mat4();
 	mat4 persp_proj = perspective(45.0, (float)width / (float)height, 0.1, 100.0);
 	mat4 ortho = identity_mat4();
-	mat4 local1 = identity_mat4();
-	local1 = rotate_z_deg(local1, 45.0f);
-	local1 = translate(local1, vec3(0.0, 0.0, -60.0f));
+	mat4 body = identity_mat4();
+	body = rotate_z_deg(body, 0.0f);
+	body = rotate_y_deg(body, 0.0f);
+	body = rotate_x_deg(body, 10.0f);
+	body = translate(body, vec3(0.0f, 5.0f, -60.0f));
+	body = scale(body, vec3(0.7f, 0.7f, 0.7f));
 
-	// for the root, we orient it in global space
-	mat4 global1 = local1;
+	// for the body/root, we orient it in global space
 	// update uniforms & draw
 	glUniformMatrix4fv(proj_mat_location, 1, GL_FALSE, persp_proj.m);
 	glUniformMatrix4fv(view_mat_location, 1, GL_FALSE, view.m);
-	glUniformMatrix4fv(matrix_location, 1, GL_FALSE, global1.m);
+	glUniformMatrix4fv(matrix_location, 1, GL_FALSE, body.m);
 	glUniformMatrix4fv(ortho_mat_location, 1, GL_FALSE, ortho.m);
 	glDrawArrays(GL_TRIANGLES, 0, teapot_vertex_count);
 
 	// child of hierarchy
-	mat4 local2 = identity_mat4();
-	local2 = rotate_y_deg(local2, rotatez);
-	// translation is 15 units in the y direction from the parents coordinate system
-	local2 = translate(local2, vec3(0.0, -15.0, 0.0));
-	// global of the child is got by pre-multiplying the local of the child by the global of the parent
-	mat4 global2 = global1 * local2;
+	// Teapot Man Head
+	mat4 head = identity_mat4();
+	head = scale(head, vec3(0.28f, 0.28f, 0.28f));
+	head = translate(head, vec3(-0.63f, 10.2f, 0.0f));
+	mat4 head_body = body * head;
+	glUniformMatrix4fv(matrix_location, 1, GL_FALSE, head_body.m);
+	glDrawArrays(GL_TRIANGLES, 0, teapot_vertex_count);
+
+	// Teapot Man Right Thigh
+	mat4 r_thigh = identity_mat4();
+	r_thigh = scale(r_thigh, vec3(0.33f, 0.6f, 0.33f));
+	r_thigh = translate(r_thigh, vec3(5.5f, -12.f, 0.0f));
+	r_thigh = body * r_thigh;
 	// update uniform & draw
-	glUniformMatrix4fv(matrix_location, 1, GL_FALSE, global2.m);
+	glUniformMatrix4fv(matrix_location, 1, GL_FALSE, r_thigh.m);
+	glDrawArrays(GL_TRIANGLES, 0, teapot_vertex_count);
+
+	// Teapot Man Right Foot
+	mat4 r_foot = identity_mat4();
+	r_foot = scale(r_foot, vec3(1.2121f, 0.55f, 1.2121f));
+	r_foot = translate(r_foot, vec3(0.0f, -12.0f, 0.0f));
+	r_foot = r_thigh * r_foot;
+	// update uniform & draw
+	glUniformMatrix4fv(matrix_location, 1, GL_FALSE, r_foot.m);
+	glDrawArrays(GL_TRIANGLES, 0, teapot_vertex_count);
+
+	// Teapot Man Left Thigh
+	mat4 l_thigh = identity_mat4();
+	l_thigh = scale(l_thigh, vec3(0.33f, 0.6f, 0.33f));
+	l_thigh = translate(l_thigh, vec3(-7.0f, -12.f, 0.0f));
+	l_thigh = body * l_thigh;
+	// update uniform & draw
+	glUniformMatrix4fv(matrix_location, 1, GL_FALSE, l_thigh.m);
+	glDrawArrays(GL_TRIANGLES, 0, teapot_vertex_count);
+
+	// Teapot Man Right Foot
+	mat4 l_foot = identity_mat4();
+	l_foot = scale(l_foot, vec3(1.2121f, 0.55f, 1.2121f));
+	l_foot = translate(l_foot, vec3(0.0f, -12.0f, 0.0f));
+	l_foot = l_thigh * l_foot;
+	// update uniform & draw
+	glUniformMatrix4fv(matrix_location, 1, GL_FALSE, l_foot.m);
 	glDrawArrays(GL_TRIANGLES, 0, teapot_vertex_count);
 
 	glutSwapBuffers();

@@ -24,8 +24,19 @@ GLuint loc1;
 GLuint loc2;
 // Movement Variables
 vec3 body_translation = vec3(0, 0, 0);
+// Head
 GLfloat head_nod = 0;
 bool head_direction_front_back = true;
+// Left Leg
+GLfloat l_thigh_angle = 0;
+bool l_thigh_direction_front_back = true;
+GLfloat l_foot_angle = 0;
+bool l_foot_direction_front_back = true;
+// Right Leg
+GLfloat r_thigh_angle = 0;
+bool r_thigh_direction_front_back = true;
+GLfloat r_foot_angle = 0;
+bool r_foot_direction_front_back = true;
 
 // Shader Functions- click on + to expand
 #pragma region SHADER_FUNCTIONS
@@ -203,6 +214,7 @@ void display() {
 	mat4 r_thigh = identity_mat4();
 	r_thigh = scale(r_thigh, vec3(0.33f, 0.6f, 0.33f));
 	r_thigh = translate(r_thigh, vec3(5.5f, -12.f, 0.0f));
+	r_thigh = rotate_x_deg(r_thigh, r_thigh_angle);
 	r_thigh = body * r_thigh;
 	// update uniform & draw
 	glUniformMatrix4fv(matrix_location, 1, GL_FALSE, r_thigh.m);
@@ -212,6 +224,7 @@ void display() {
 	mat4 r_foot = identity_mat4();
 	r_foot = scale(r_foot, vec3(1.2121f, 0.55f, 1.2121f));
 	r_foot = translate(r_foot, vec3(0.0f, -12.0f, 0.0f));
+	r_foot = rotate_x_deg(r_foot, r_foot_angle);
 	r_foot = r_thigh * r_foot;
 	// update uniform & draw
 	glUniformMatrix4fv(matrix_location, 1, GL_FALSE, r_foot.m);
@@ -221,15 +234,17 @@ void display() {
 	mat4 l_thigh = identity_mat4();
 	l_thigh = scale(l_thigh, vec3(0.33f, 0.6f, 0.33f));
 	l_thigh = translate(l_thigh, vec3(-7.0f, -12.f, 0.0f));
+	l_thigh = rotate_x_deg(l_thigh, l_thigh_angle);
 	l_thigh = body * l_thigh;
 	// update uniform & draw
 	glUniformMatrix4fv(matrix_location, 1, GL_FALSE, l_thigh.m);
 	glDrawArrays(GL_TRIANGLES, 0, teapot_vertex_count);
 
-	// Teapot Man Right Foot
+	// Teapot Man Left Foot
 	mat4 l_foot = identity_mat4();
 	l_foot = scale(l_foot, vec3(1.2121f, 0.55f, 1.2121f));
 	l_foot = translate(l_foot, vec3(0.0f, -12.0f, 0.0f));
+	l_foot = rotate_x_deg(l_foot, l_foot_angle);
 	l_foot = l_thigh * l_foot;
 	// update uniform & draw
 	glUniformMatrix4fv(matrix_location, 1, GL_FALSE, l_foot.m);
@@ -290,7 +305,6 @@ void keypress(unsigned char key, int xmouse, int ymouse) {
 		// Head Nod
 		case('h'):
 			std::cout << (debug_mode ? "Nodding" : "") << std::endl;
-			std::cout << head_nod << endl;
 			if (head_direction_front_back == true) {
 				std::cout << (debug_mode ? "Nodding front +5" : "") << std::endl;
 				head_nod += 5;
@@ -306,11 +320,93 @@ void keypress(unsigned char key, int xmouse, int ymouse) {
 				head_direction_front_back = true;
 			}
 			break;
+		// left thigh movement
+		case('q'):
+			std::cout << (debug_mode ? "Left thighing" : "") << std::endl;
+			if (l_thigh_direction_front_back == true) {
+				std::cout << (debug_mode ? "Left thighing +5" : "") << std::endl;
+				l_thigh_angle += 5;
+			}
+			else if (l_thigh_direction_front_back == false) {
+				std::cout << (debug_mode ? "Left thighing -5" : "") << std::endl;
+				l_thigh_angle -= 5;
+			}
+			if (l_thigh_angle >= 35) {
+				std::cout << (debug_mode ? "Left thighing back" : "") << std::endl;
+				l_thigh_direction_front_back = false;
+			}
+			else if (l_thigh_angle <= -35) {
+				std::cout << (debug_mode ? "Left thighing front" : "") << std::endl;
+				l_thigh_direction_front_back = true;
+			}
+			break;
+		case('z'):
+			std::cout << (debug_mode ? "Left Footing" : "") << std::endl;
+			if (l_foot_direction_front_back == true) {
+				std::cout << (debug_mode ? "Left footing +3" : "") << std::endl;
+				l_foot_angle += 5;
+			}
+			else if (l_foot_direction_front_back == false) {
+				std::cout << (debug_mode ? "Left footing -3" : "") << std::endl;
+				l_foot_angle -= 5;
+			}
+			if (l_foot_angle >= 10) {
+				std::cout << (debug_mode ? "Left footing back" : "") << std::endl;
+				l_foot_direction_front_back = false;
+			}
+			else if (l_foot_angle <= -25) {
+				std::cout << (debug_mode ? "Left footing front" : "") << std::endl;
+				l_foot_direction_front_back = true;
+			}
+			break;
+		// right thigh movement
+		case('e'):
+			std::cout << (debug_mode ? "Right thighing" : "") << std::endl;
+			if (r_thigh_direction_front_back == true) {
+				std::cout << (debug_mode ? "Right thighing +5" : "") << std::endl;
+				r_thigh_angle += 5;
+			}
+			else if (r_thigh_direction_front_back == false) {
+				std::cout << (debug_mode ? "Right thighing -5" : "") << std::endl;
+				r_thigh_angle -= 5;
+			}
+			if (r_thigh_angle >= 35) {
+				std::cout << (debug_mode ? "Right thighing back" : "") << std::endl;
+				r_thigh_direction_front_back = false;
+			}
+			else if (r_thigh_angle <= -35) {
+				std::cout << (debug_mode ? "Right thighing front" : "") << std::endl;
+				r_thigh_direction_front_back = true;
+			}
+			break;
+		case('c'):
+			std::cout << (debug_mode ? "Right Footing" : "") << std::endl;
+			if (r_foot_direction_front_back == true) {
+				std::cout << (debug_mode ? "Right footing +3" : "") << std::endl;
+				r_foot_angle += 5;
+			}
+			else if (r_foot_direction_front_back == false) {
+				std::cout << (debug_mode ? "Right footing -3" : "") << std::endl;
+				r_foot_angle -= 5;
+			}
+			if (r_foot_angle >= 10) {
+				std::cout << (debug_mode ? "Right footing back" : "") << std::endl;
+				r_foot_direction_front_back = false;
+			}
+			else if (r_foot_angle <= -25) {
+				std::cout << (debug_mode ? "Right footing front" : "") << std::endl;
+				r_foot_direction_front_back = true;
+			}
+			break;
 		// HARD RESET
 		case('R'):
 			std::cout << "Hard Reset" << endl;
 			body_translation = vec3(0, 0, 0);
 			head_nod = 0;
+			l_thigh_angle = 0;
+			l_foot_angle = 0;
+			r_thigh_angle = 0;
+			r_foot_angle = 0;
 			break;
 	}
 

@@ -12,6 +12,7 @@
 // Macro for indexing vertex buffer
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
+#define debug_mode true
 using namespace std;
 GLuint shaderProgramID;
 
@@ -21,9 +22,10 @@ int height = 600;
 
 GLuint loc1;
 GLuint loc2;
-// Rotation variables
-GLfloat rotatez = 0.0f;
-
+// Movement Variables
+vec3 body_translation = vec3(0, 0, 0);
+GLfloat head_nod = 0;
+bool head_direction_front_back = true;
 
 // Shader Functions- click on + to expand
 #pragma region SHADER_FUNCTIONS
@@ -177,6 +179,7 @@ void display() {
 	body = rotate_x_deg(body, 10.0f);
 	body = translate(body, vec3(0.0f, 5.0f, -60.0f));
 	body = scale(body, vec3(0.7f, 0.7f, 0.7f));
+	body = translate(body, body_translation);
 
 	// for the body/root, we orient it in global space
 	// update uniforms & draw
@@ -191,6 +194,7 @@ void display() {
 	mat4 head = identity_mat4();
 	head = scale(head, vec3(0.28f, 0.28f, 0.28f));
 	head = translate(head, vec3(-0.63f, 10.2f, 0.0f));
+	head = rotate_x_deg(head, head_nod);
 	mat4 head_body = body * head;
 	glUniformMatrix4fv(matrix_location, 1, GL_FALSE, head_body.m);
 	glDrawArrays(GL_TRIANGLES, 0, teapot_vertex_count);
@@ -247,7 +251,7 @@ void updateScene() {
 		delta = 0.03f;
 	last_time = curr_time;
 
-	rotatez += 0.2f;
+///	rotatez += 0.2f;
 	// Draw the next frame
 	glutPostRedisplay();
 }
@@ -263,10 +267,51 @@ void init()
 }
 
 // Placeholder code for the keypress
-void keypress(unsigned char key, int x, int y) {
+void keypress(unsigned char key, int xmouse, int ymouse) {
 
-	if (key == 'x') {
-		//Translate the base, etc.
+	switch (key) {
+		// General Teapot man translation
+		// Forward
+		case('w'):
+			body_translation.v[2] = body_translation.v[2] - 0.2f;
+			break;
+		// Backwards
+		case('s'):
+			body_translation.v[2] = body_translation.v[2] + 0.2f;
+			break;
+		// Right
+		case('a'):
+			body_translation.v[0] = body_translation.v[0] - 0.2f;
+			break;
+		// Left
+		case('d'):
+			body_translation.v[0] = body_translation.v[0] + 0.2f;
+			break;
+		// Head Nod
+		case('h'):
+			std::cout << (debug_mode ? "Nodding" : "") << std::endl;
+			std::cout << head_nod << endl;
+			if (head_direction_front_back == true) {
+				std::cout << (debug_mode ? "Nodding front +5" : "") << std::endl;
+				head_nod += 5;
+			}else if (head_direction_front_back == false) {
+				std::cout << (debug_mode ? "Nodding back -5" : "") << std::endl;
+				head_nod -= 5;
+			}
+			if (head_nod >= 35) {
+				std::cout << (debug_mode ? "Nodding back" : "") << std::endl;
+				head_direction_front_back = false;
+			}else if (head_nod <= -35) {
+				std::cout << (debug_mode ? "Nodding front" : "") << std::endl;
+				head_direction_front_back = true;
+			}
+			break;
+		// HARD RESET
+		case('R'):
+			std::cout << "Hard Reset" << endl;
+			body_translation = vec3(0, 0, 0);
+			head_nod = 0;
+			break;
 	}
 
 }

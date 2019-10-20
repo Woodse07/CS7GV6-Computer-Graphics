@@ -532,6 +532,19 @@ mat4 perspective (float fovy, float aspect, float near, float far) {
 	return m;
 }
 
+// returns a perspective matrix
+// Ortho is mostly used for UI, 2D stuff
+mat4 ortho(float left, float right, float bottom, float top, float near, float far) {
+	mat4 m = zero_mat4(); // make sure bottom-right corner is zero
+	m.m[0] = 2 / (right - left);
+	m.m[5] = 2 / (top - bottom);
+	m.m[10] = -2 / (far - near);
+	m.m[12] = -((left + right) / (right - left));
+	m.m[13] = -((top + bottom) / (top - bottom));
+	m.m[14] = -((far + near) / (far - near));
+	m.m[15] = 1;
+	return m;
+}
 
 /*------------------------------HAMILTON IN DA HOUSE!-----------------------------*/
 versor::versor () { }

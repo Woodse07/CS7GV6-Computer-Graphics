@@ -3,17 +3,21 @@
 #include <windows.h>
 #include <mmsystem.h>
 
-#include <GL/glew.h>
-#include <GL/freeglut.h>
+// C++ standard libraries
 #include <iostream>
-
-#include "maths_funcs.h" //Anton's math class
-#include "teapot.h" // teapot mesh
 #include <string> 
 #include <fstream>
 #include <iostream>
 #include <sstream>
 
+// OpenGL Libraries
+#include <GL/glew.h>
+#include <GL/freeglut.h>
+
+// Custom Libraries
+#include "maths_funcs.h" //Anton's math class
+#include "teapot.h" // teapot mesh
+#include "load_files.h"
 
 //typedef double DWORD;
 
@@ -181,7 +185,6 @@ void display(){
 	mat4 view = translate (identity_mat4 (), vec3 (0.0, 0.0, -40.0));
 	mat4 persp_proj = perspective(90.0, (float)(width/2)/(float)height, 0.1, 100.0);
 	mat4 model = identity_mat4();
-
 	glViewport (0, 0, width/2, height);
 	glUniformMatrix4fv (proj_mat_location, 1, GL_FALSE, persp_proj.m);
 	glUniformMatrix4fv (view_mat_location, 1, GL_FALSE, view.m);
@@ -189,6 +192,8 @@ void display(){
 	glDrawArrays (GL_TRIANGLES, 0, teapot_vertex_count);
 
 	// Right
+	mat4 ortho_top = ortho(-1.2f, 1.2f, -1.2f, 1.2f, -1.2f, 1.2f);
+	model = ortho_top * rotate_x_deg(model, -90.0f);
 	glViewport(width/2, 0, width/2, height);
 	glUniformMatrix4fv(proj_mat_location, 1, GL_FALSE, persp_proj.m);
 	glUniformMatrix4fv(view_mat_location, 1, GL_FALSE, view.m);

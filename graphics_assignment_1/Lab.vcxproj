@@ -131,11 +131,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="input.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="maths_funcs.cpp" />
     <ClCompile Include="load_files.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="input.h" />
     <ClInclude Include="load_files.h" />
     <ClInclude Include="maths_funcs.h" />
   </ItemGroup>

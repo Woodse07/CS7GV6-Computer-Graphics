@@ -17,7 +17,7 @@
 // Custom Libraries
 #include "maths_funcs.h" //Anton's math class
 #include "teapot.h" // teapot mesh
-#include "load_files.h"
+#include "input.h"
 
 //typedef double DWORD;
 
@@ -28,11 +28,15 @@
 using namespace std;
 GLuint shaderProgramID;
 
+// Variables referenced in header files
+float x_mouse;
+float y_mouse;
+
 unsigned int teapot_vao = 0;
 int width = 1600.0;
 int height = 600.0;
-GLuint loc1;
-GLuint loc2;
+GLuint vertex_position_location;
+GLuint vertex_normals_location;
 
 // Shader Functions- click on + to expand
 #pragma region SHADER_FUNCTIONS
@@ -129,15 +133,11 @@ GLuint CompileShaders()
 // VBO Functions - click on + to expand
 #pragma region VBO_FUNCTIONS
 
-
-
-
-
 void generateObjectBufferTeapot () {
 	GLuint vp_vbo = 0;
 
-	loc1 = glGetAttribLocation(shaderProgramID, "vertex_position");
-	loc2 = glGetAttribLocation(shaderProgramID, "vertex_normals");
+	vertex_position_location = glGetAttribLocation(shaderProgramID, "vertex_position");
+	vertex_normals_location = glGetAttribLocation(shaderProgramID, "vertex_normals");
 	
 	glGenBuffers (1, &vp_vbo);
 	glBindBuffer (GL_ARRAY_BUFFER, vp_vbo);
@@ -150,12 +150,12 @@ void generateObjectBufferTeapot () {
 	glGenVertexArrays (1, &teapot_vao);
 	glBindVertexArray (teapot_vao);
 
-	glEnableVertexAttribArray (loc1);
+	glEnableVertexAttribArray (vertex_position_location);
 	glBindBuffer (GL_ARRAY_BUFFER, vp_vbo);
-	glVertexAttribPointer (loc1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-	glEnableVertexAttribArray (loc2);
+	glVertexAttribPointer (vertex_position_location, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+	glEnableVertexAttribArray (vertex_normals_location);
 	glBindBuffer (GL_ARRAY_BUFFER, vn_vbo);
-	glVertexAttribPointer (loc2, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+	glVertexAttribPointer (vertex_normals_location, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 }
 
 
@@ -176,7 +176,7 @@ void display(){
 	int matrix_location = glGetUniformLocation (shaderProgramID, "model");
 	int view_mat_location = glGetUniformLocation (shaderProgramID, "view");
 	int proj_mat_location = glGetUniformLocation (shaderProgramID, "proj");
-	
+	mat4 lookat = look_at(vec3(x_mouse, y_mouse, 1.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0, 1, 0));
 
 	//Here is where the code for the viewport lab will go, to get you started I have drawn a t-pot in the bottom left
 	//The model transform rotates the object by 45 degrees, the view transform sets the camera at -40 on the z-axis, and the perspective projection is setup using Antons method
@@ -184,7 +184,7 @@ void display(){
 	// Left
 	mat4 view = translate (identity_mat4 (), vec3 (0.0, 0.0, -40.0));
 	mat4 persp_proj = perspective(90.0, (float)(width/2)/(float)height, 0.1, 100.0);
-	mat4 model = identity_mat4();
+	mat4 model = identity_mat4()*lookat;
 	glViewport (0, 0, width/2, height);
 	glUniformMatrix4fv (proj_mat_location, 1, GL_FALSE, persp_proj.m);
 	glUniformMatrix4fv (view_mat_location, 1, GL_FALSE, view.m);
@@ -193,6 +193,7 @@ void display(){
 
 	// Right
 	mat4 ortho_top = ortho(-1.2f, 1.2f, -1.2f, 1.2f, -1.2f, 1.2f);
+	model = identity_mat4();
 	model = ortho_top * rotate_x_deg(model, -90.0f);
 	glViewport(width/2, 0, width/2, height);
 	glUniformMatrix4fv(proj_mat_location, 1, GL_FALSE, persp_proj.m);
@@ -206,14 +207,15 @@ void display(){
 
 void updateScene() {	
 
-		// Wait until at least 16ms passed since start of last frame (Effectively caps framerate at ~60fps)
+	// Wait until at least 16ms passed since start of last frame (Effectively caps framerate at ~60fps)
 	static DWORD  last_time = 0;
 	DWORD  curr_time = timeGetTime();
 	float  delta = (curr_time - last_time) * 0.001f;
 	if (delta > 0.03f)
 		delta = 0.03f;
 	last_time = curr_time;
-
+	std::cout << "X Coordinates " << x_mouse << std::endl;
+	std::cout << "Y Coordinates " << y_mouse << std::endl;
 	// Draw the next frame
 	glutPostRedisplay();
 }
@@ -247,6 +249,8 @@ int main(int argc, char** argv){
 	// Tell glut where the display function is
 	glutDisplayFunc(display);
 	glutIdleFunc(updateScene);
+	glutKeyboardFunc(keypress);
+	glutPassiveMotionFunc(mouse_move);
 
 	 // A call to glewInit() must be done after glut is initialized!
 	glewExperimental = GL_TRUE; //for non-lab machines, this line gives better modern GL support

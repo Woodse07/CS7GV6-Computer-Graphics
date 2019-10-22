@@ -131,15 +131,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="input.cpp" />
+    <ClCompile Include="keyboard_mouse_input.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="maths_funcs.cpp" />
-    <ClCompile Include="load_files.cpp" />
+    <ClCompile Include="blender_loader.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="input.h" />
-    <ClInclude Include="load_files.h" />
+    <ClInclude Include="keyboard_mouse_input.h" />
+    <ClInclude Include="blender_loader.h" />
     <ClInclude Include="maths_funcs.h" />
+    <ClInclude Include="teapot.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Shaders\simpleFragmentShader.txt" />
+    <Text Include="Shaders\simpleVertexShader.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

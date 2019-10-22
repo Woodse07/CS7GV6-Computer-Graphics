@@ -1,26 +1,22 @@
-
 //Some Windows Headers (For Time, IO, etc.)
 #include <windows.h>
 #include <mmsystem.h>
-
-// C++ standard libraries
-#include <iostream>
-#include <string> 
-#include <fstream>
-#include <iostream>
-#include <sstream>
 
 // OpenGL Libraries
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
+// C++ standard libraries
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <string> 
+
 // Custom Libraries
+#include "blender_loader.h"
+#include "keyboard_mouse_input.h"
 #include "maths_funcs.h" //Anton's math class
 #include "teapot.h" // teapot mesh
-#include "input.h"
-
-//typedef double DWORD;
-
 
 // Macro for indexing vertex buffer
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
@@ -37,6 +33,8 @@ int width = 1600.0;
 int height = 600.0;
 GLuint vertex_position_location;
 GLuint vertex_normals_location;
+
+blenderObj blenderObject("../rami_chan.obj");
 
 // Shader Functions- click on + to expand
 #pragma region SHADER_FUNCTIONS
@@ -132,7 +130,6 @@ GLuint CompileShaders()
 
 // VBO Functions - click on + to expand
 #pragma region VBO_FUNCTIONS
-
 void generateObjectBufferTeapot () {
 	GLuint vp_vbo = 0;
 
@@ -141,11 +138,13 @@ void generateObjectBufferTeapot () {
 	
 	glGenBuffers (1, &vp_vbo);
 	glBindBuffer (GL_ARRAY_BUFFER, vp_vbo);
-	glBufferData (GL_ARRAY_BUFFER, 3 * teapot_vertex_count * sizeof (float), teapot_vertex_points, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 3 * blenderObject.numvertices * sizeof(float), blenderObject.float_vertices.data(), GL_STATIC_DRAW);
+	//glBufferData (GL_ARRAY_BUFFER, 3 * teapot_vertex_count * sizeof (float), teapot_vertex_points, GL_STATIC_DRAW);
 	GLuint vn_vbo = 0;
 	glGenBuffers (1, &vn_vbo);
 	glBindBuffer (GL_ARRAY_BUFFER, vn_vbo);
-	glBufferData (GL_ARRAY_BUFFER, 3 * teapot_vertex_count * sizeof (float), teapot_normals, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 3 * blenderObject.numvertices * sizeof(float), blenderObject.float_normals.data() , GL_STATIC_DRAW);
+	//glBufferData (GL_ARRAY_BUFFER, 3 * teapot_vertex_count * sizeof (float), teapot_normals, GL_STATIC_DRAW);
   
 	glGenVertexArrays (1, &teapot_vao);
 	glBindVertexArray (teapot_vao);
@@ -157,20 +156,16 @@ void generateObjectBufferTeapot () {
 	glBindBuffer (GL_ARRAY_BUFFER, vn_vbo);
 	glVertexAttribPointer (vertex_normals_location, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 }
-
-
 #pragma endregion VBO_FUNCTIONS
 
 
 void display(){
-
 	// tell GL to only draw onto a pixel if the shape is closer to the viewer
 	glEnable (GL_DEPTH_TEST); // enable depth-testing
 	glDepthFunc (GL_LESS); // depth-testing interprets a smaller value as "closer"
 	glClearColor (0.5f, 0.5f, 0.5f, 1.0f);
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glUseProgram (shaderProgramID);
-
 
 	//Declare your uniform variables that will be used in your shader
 	int matrix_location = glGetUniformLocation (shaderProgramID, "model");
@@ -182,14 +177,15 @@ void display(){
 	//The model transform rotates the object by 45 degrees, the view transform sets the camera at -40 on the z-axis, and the perspective projection is setup using Antons method
 
 	// Left
-	mat4 view = translate (identity_mat4 (), vec3 (0.0, 0.0, -40.0));
+	mat4 view = translate (identity_mat4 (), vec3 (0.0, 0.0, -2.0));
 	mat4 persp_proj = perspective(90.0, (float)(width/2)/(float)height, 0.1, 100.0);
 	mat4 model = identity_mat4()*lookat;
 	glViewport (0, 0, width/2, height);
 	glUniformMatrix4fv (proj_mat_location, 1, GL_FALSE, persp_proj.m);
 	glUniformMatrix4fv (view_mat_location, 1, GL_FALSE, view.m);
 	glUniformMatrix4fv (matrix_location, 1, GL_FALSE, model.m);
-	glDrawArrays (GL_TRIANGLES, 0, teapot_vertex_count);
+	glDrawArrays(GL_TRIANGLES, 0, blenderObject.numvertices);
+	//glDrawArrays (GL_TRIANGLES, 0, teapot_vertex_count);
 
 	// Right
 	mat4 ortho_top = ortho(-1.2f, 1.2f, -1.2f, 1.2f, -1.2f, 1.2f);
@@ -199,11 +195,11 @@ void display(){
 	glUniformMatrix4fv(proj_mat_location, 1, GL_FALSE, persp_proj.m);
 	glUniformMatrix4fv(view_mat_location, 1, GL_FALSE, view.m);
 	glUniformMatrix4fv(matrix_location, 1, GL_FALSE, model.m);
-	glDrawArrays(GL_TRIANGLES, 0, teapot_vertex_count);
+	glDrawArrays(GL_TRIANGLES, 0, blenderObject.numvertices);
+	//glDrawArrays(GL_TRIANGLES, 0, teapot_vertex_count);
 
     glutSwapBuffers();
 }
-
 
 void updateScene() {	
 
@@ -214,8 +210,6 @@ void updateScene() {
 	if (delta > 0.03f)
 		delta = 0.03f;
 	last_time = curr_time;
-	std::cout << "X Coordinates " << x_mouse << std::endl;
-	std::cout << "Y Coordinates " << y_mouse << std::endl;
 	// Draw the next frame
 	glutPostRedisplay();
 }
@@ -266,14 +260,3 @@ int main(int argc, char** argv){
 	glutMainLoop();
     return 0;
 }
-
-
-
-
-
-
-
-
-
-
-

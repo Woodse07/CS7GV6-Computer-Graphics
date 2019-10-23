@@ -1,9 +1,11 @@
 #version 330
 
-in vec3 vertex_position;
-in vec3 vertex_normals;
+in vec3 vertexPosition;
+in vec3 vertexNormals;
 
-out vec3 n_eye;
+out vec3 nEye;
+out vec3 vsNormals;
+out vec3 vsPosition;
 
 uniform mat4 view;
 uniform mat4 proj;
@@ -11,6 +13,8 @@ uniform mat4 ortho;
 uniform mat4 model;
 
 void main(){
-	n_eye = (view * vec4 (vertex_normals, 0.0)).xyz;
-	gl_Position =  proj * view * model * ortho* vec4 (vertex_position, 1.0);
+	nEye = (view * vec4 (vertexNormals, 0.0)).xyz;
+	gl_Position =  proj * view * model * ortho* vec4 (vertexPosition, 1.0);
+	vsNormals = vertexNormals;
+	vsPosition = vertexPosition;
 }

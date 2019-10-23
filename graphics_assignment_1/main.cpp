@@ -49,6 +49,9 @@ ProjectionMatrices model1;
 ProjectionMatrices model2;
 bool model2ToggleView = true;
 
+// Light Position
+vec3 lightPosition = vec3(0, 0, 0);
+
 // Shader Functions- click on + to expand
 #pragma region SHADER_FUNCTIONS
 
@@ -146,8 +149,8 @@ GLuint CompileShaders()
 void generateObjectBuffer () {
 	GLuint vp_vbo = 0;
 
-	vertexPositionLocation = glGetAttribLocation(shaderProgramID, "vertex_position");
-	vertexNormalsLocation = glGetAttribLocation(shaderProgramID, "vertex_normals");
+	vertexPositionLocation = glGetAttribLocation(shaderProgramID, "vertexPosition");
+	vertexNormalsLocation = glGetAttribLocation(shaderProgramID, "vertexNormals");
 	
 	glGenBuffers (1, &vp_vbo);
 	glBindBuffer (GL_ARRAY_BUFFER, vp_vbo);
@@ -176,7 +179,7 @@ void display(){
 	// tell GL to only draw onto a pixel if the shape is closer to the viewer
 	glEnable (GL_DEPTH_TEST); // enable depth-testing
 	glDepthFunc (GL_LESS); // depth-testing interprets a smaller value as "closer"
-	glClearColor (0.5f, 0.5f, 0.5f, 1.0f);
+	glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glUseProgram (shaderProgramID);
 
@@ -185,6 +188,7 @@ void display(){
 	int view_mat_location = glGetUniformLocation (shaderProgramID, "view");
 	int proj_mat_location = glGetUniformLocation (shaderProgramID, "proj");
 	int ortho_mat_location = glGetUniformLocation(shaderProgramID, "ortho");
+	int light_pos_location = glGetUniformLocation(shaderProgramID, "lightPos");
 
 	//Here is where the code for the viewport lab will go, to get you started I have drawn a t-pot in the bottom left
 	//The model transform rotates the object by 45 degrees, the view transform sets the camera at -40 on the z-axis, and the perspective projection is setup using Antons method
@@ -198,6 +202,8 @@ void display(){
 	glUniformMatrix4fv (view_mat_location, 1, GL_FALSE, model1.view.m);
 	glUniformMatrix4fv (model_location, 1, GL_FALSE, model1.model.m);
 	glUniformMatrix4fv(ortho_mat_location, 1, GL_FALSE, model1.ortho.m);
+	// Light Position
+	glUniformMatrix4fv(light_pos_location, 1, GL_FALSE, lightPosition.v);
 	glDrawArrays(GL_TRIANGLES, 0, blenderObject1.getNumVertices());
 	//glDrawArrays (GL_TRIANGLES, 0, teapot_vertex_count);
 
@@ -210,6 +216,8 @@ void display(){
 		glUniformMatrix4fv(view_mat_location, 1, GL_FALSE, model2.view.m);
 		glUniformMatrix4fv(model_location, 1, GL_FALSE, model2.model.m);
 		glUniformMatrix4fv(ortho_mat_location, 1, GL_FALSE, model2.ortho.m);
+		// Light Position
+		glUniformMatrix4fv(light_pos_location, 1, GL_FALSE, vec3(1, 1, 1).v);
 		glDrawArrays(GL_TRIANGLES, 0, blenderObject1.getNumVertices());
 		//glDrawArrays(GL_TRIANGLES, 0, teapot_vertex_count);
 	}

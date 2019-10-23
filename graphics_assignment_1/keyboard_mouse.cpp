@@ -24,6 +24,8 @@ void keyPress(unsigned char key, int xmouse, int ymouse) {
 			z_mouse = 1.0f;
 			x_pos = 0.0f;
 			z_pos = 0.0f;
+			ambientStrength = 1.0f;
+			specularStrength = 1.0f;
 			break;
 	}
 };
@@ -44,9 +46,24 @@ void mouseWheel(int key, int wheeldir, int x, int y) {
 }
 
 void specialKeypress(int key, int x, int y) {
+	switch (key) {
 	//std::cout << "Special Keypress: " << keypress << std::endl;
-	if (key == GLUT_KEY_F1) {
-		//std::cout << "F1 Pressed, Map Toggle" << std::endl;
-		model2ToggleView = !model2ToggleView;
+		case(GLUT_KEY_F1):
+			model2ToggleView = !model2ToggleView;
+			break;
+	// Specular Lighting settings, up for up, down for down
+		case(GLUT_KEY_UP):
+			specularStrength += 0.02;
+			break;
+		case(GLUT_KEY_DOWN):
+			specularStrength -= 0.02;
+			break;
+	// Ambient Lighting controls, left for down, right for up
+		case(GLUT_KEY_LEFT):
+			ambientStrength -= 0.02;
+			break;
+		case(GLUT_KEY_RIGHT):
+			ambientStrength += 0.02;
+			break;
 	}
 };

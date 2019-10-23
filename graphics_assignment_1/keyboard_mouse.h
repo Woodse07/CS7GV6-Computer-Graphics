@@ -25,6 +25,10 @@ extern float z_mouse;
 extern float x_pos;
 extern float z_pos;
 
+// Light Intensity
+extern float ambientStrength;
+extern float specularStrength;
+
 // keyboard/mouse input function declarations
 void keyPress(unsigned char key, int xmouse, int ymouse);
 

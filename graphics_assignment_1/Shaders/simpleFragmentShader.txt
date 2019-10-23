@@ -3,14 +3,25 @@
 in vec3 nEye;
 in vec3 vsNormals;
 in vec3 vsPosition;
+in vec3 vsLightPos;
 
 out vec4 fragColour;
 
 uniform vec3 lightPos;
+uniform vec3 viewPos;
+
+uniform float ambientStr;
+uniform float specularStr;
 
 void main(){
-	vec3 lightVector = normalize(lightPos - vsPosition);
-	float brightness = dot(lightVector, vsNormals);
-	float ambientStrength = 1.0;
-	fragColour = vec4 (nEye * brightness, 1.0);
+	// Global Lighting Variables
+	vec3 lightDir = normalize(lightPos - vsPosition);
+	vec3 norm = normalize(vsNormals);
+	// Diffuse Lighting
+	float diffuse = max(dot(norm, lightDir), 0.0);
+	// Specular Lighting
+	vec3 viewDir = normalize(viewPos - vsPosition);
+	vec3 reflectDir = reflect(-lightDir, norm);
+	float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32); 
+	fragColour = vec4 (nEye * ambientStr , 1.0);
 }

@@ -31,12 +31,20 @@ float x_mouse;
 float y_mouse;
 
 unsigned int teapot_vao = 0;
+
+// ViewPort Dimensions
 int width = 800.0;
 int height = 600.0;
+
+// Shader Variables
 GLuint vertexPositionLocation;
 GLuint vertexNormalsLocation;
 
+// Model Load Variables
 BlenderObj blenderObject("../rami_chan.obj");
+ProjectionMatrices model1;
+ProjectionMatrices model2;
+mat4 lookat;
 
 // Shader Functions- click on + to expand
 #pragma region SHADER_FUNCTIONS
@@ -170,38 +178,31 @@ void display(){
 	glUseProgram (shaderProgramID);
 
 	//Declare your uniform variables that will be used in your shader
-	int matrix_location = glGetUniformLocation (shaderProgramID, "model");
+	int model_location = glGetUniformLocation (shaderProgramID, "model");
 	int view_mat_location = glGetUniformLocation (shaderProgramID, "view");
 	int proj_mat_location = glGetUniformLocation (shaderProgramID, "proj");
 	int ortho_mat_location = glGetUniformLocation(shaderProgramID, "ortho");
-	mat4 lookat = look_at(vec3(x_mouse, y_mouse, 1.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0, 1, 0));
 
 	//Here is where the code for the viewport lab will go, to get you started I have drawn a t-pot in the bottom left
 	//The model transform rotates the object by 45 degrees, the view transform sets the camera at -40 on the z-axis, and the perspective projection is setup using Antons method
 
 	// Main Viewport
-	mat4 view_mat = translate (identity_mat4 (), vec3 (0.0, 0.0, -2.0));
-	mat4 persp_mat = perspective(90.0, (float)(width)/(float)height, 0.1, 100.0);
-	mat4 model_mat = identity_mat4()*lookat;
-	mat4 ortho_mat = identity_mat4();
 	glViewport (0, 0, width, height);
 	//glScissor(0, 0, width, height);
-	glUniformMatrix4fv (proj_mat_location, 1, GL_FALSE, persp_mat.m);
-	glUniformMatrix4fv (view_mat_location, 1, GL_FALSE, view_mat.m);
-	glUniformMatrix4fv (matrix_location, 1, GL_FALSE, model_mat.m);
-	glUniformMatrix4fv(ortho_mat_location, 1, GL_FALSE, ortho_mat.m);
+	glUniformMatrix4fv (proj_mat_location, 1, GL_FALSE, model1.projection.m);
+	glUniformMatrix4fv (view_mat_location, 1, GL_FALSE, model1.view.m);
+	glUniformMatrix4fv (model_location, 1, GL_FALSE, model1.model.m);
+	glUniformMatrix4fv(ortho_mat_location, 1, GL_FALSE, model1.ortho.m);
 	glDrawArrays(GL_TRIANGLES, 0, blenderObject.getNumVertices());
 	//glDrawArrays (GL_TRIANGLES, 0, teapot_vertex_count);
 
 	// Map Viewport
-	ortho_mat = ortho(-1.2f, 1.2f, -1.2f, 1.2f, -1.2f, 1.2f);
-	model_mat = rotate_x_deg(identity_mat4(), 90.0f);
 	glViewport(0, 0, width/6, height/6);
 	//glScissor(0, 0, width / 8, height / 8);
-	glUniformMatrix4fv(proj_mat_location, 1, GL_FALSE, persp_mat.m);
-	glUniformMatrix4fv(view_mat_location, 1, GL_FALSE, view_mat.m);
-	glUniformMatrix4fv(matrix_location, 1, GL_FALSE, model_mat.m);
-	glUniformMatrix4fv(ortho_mat_location, 1, GL_FALSE, ortho_mat.m);
+	glUniformMatrix4fv(proj_mat_location, 1, GL_FALSE, model2.projection.m);
+	glUniformMatrix4fv(view_mat_location, 1, GL_FALSE, model2.view.m);
+	glUniformMatrix4fv(model_location, 1, GL_FALSE, model2.model.m);
+	glUniformMatrix4fv(ortho_mat_location, 1, GL_FALSE, model2.ortho.m);
 	glDrawArrays(GL_TRIANGLES, 0, blenderObject.getNumVertices());
 	//glDrawArrays(GL_TRIANGLES, 0, teapot_vertex_count);
     glutSwapBuffers();
@@ -216,6 +217,8 @@ void updateScene() {
 	if (delta > 0.03f)
 		delta = 0.03f;
 	last_time = curr_time;
+	lookat = look_at(vec3(x_mouse, y_mouse, 1.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0, 1, 0));
+	model1.model = look_at(vec3(x_mouse, y_mouse, 1.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0, 1, 0));
 	// Draw the next frame
 	glutPostRedisplay();
 }
@@ -240,7 +243,17 @@ void init()
 }
 
 int main(int argc, char** argv){
+	// Creating model initial values
+	// Model 1 View
+	model1.projection = perspective(90.0, (float)(width) / (float)height, 0.1, 100.0);
+	model1.view = translate(identity_mat4(), vec3(0.0, 0.0, -2.0));
+	model1.model = identity_mat4();
+	model1.ortho = identity_mat4();
 
+	// Model 2 View
+	model2 = model1;
+	model2.ortho = ortho(-1.2f, 1.2f, -1.2f, 1.2f, -1.2f, 1.2f);
+	model2.model = rotate_x_deg(identity_mat4(), 90.0f);
 	// Set up the window
 	glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);

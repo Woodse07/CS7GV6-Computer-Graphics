@@ -1,10 +1,13 @@
-#ifndef _PROJECTION_MATRICES_H_
+#ifndef _PROJECTION_MATRICES_H
 #define _PROJECTION_MATRICES_H_
-#include "math.h"
+#include <maths_funcs.h> //Anton's math class
 
 class ProjectionMatrices {
-private:
-	double length;
+public:
+	mat4 projection;
+	mat4 view;
+	mat4 model;
+	mat4 ortho;
 };
 
-#endif //_PROJECTIONMATRICES_H_
+#endif //_PROJECTION_MATRICES_H

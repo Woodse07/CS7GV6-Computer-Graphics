@@ -44,7 +44,7 @@ GLuint vertexNormalsLocation;
 BlenderObj blenderObject("../rami_chan.obj");
 ProjectionMatrices model1;
 ProjectionMatrices model2;
-mat4 lookat;
+bool model2ToggleView = true;
 
 // Shader Functions- click on + to expand
 #pragma region SHADER_FUNCTIONS
@@ -197,14 +197,17 @@ void display(){
 	//glDrawArrays (GL_TRIANGLES, 0, teapot_vertex_count);
 
 	// Map Viewport
-	glViewport(0, 0, width/6, height/6);
-	//glScissor(0, 0, width / 8, height / 8);
-	glUniformMatrix4fv(proj_mat_location, 1, GL_FALSE, model2.projection.m);
-	glUniformMatrix4fv(view_mat_location, 1, GL_FALSE, model2.view.m);
-	glUniformMatrix4fv(model_location, 1, GL_FALSE, model2.model.m);
-	glUniformMatrix4fv(ortho_mat_location, 1, GL_FALSE, model2.ortho.m);
-	glDrawArrays(GL_TRIANGLES, 0, blenderObject.getNumVertices());
-	//glDrawArrays(GL_TRIANGLES, 0, teapot_vertex_count);
+	if (model2ToggleView == true) {
+		glViewport(0, 0, width / 6, height / 6);
+		//glScissor(0, 0, width / 8, height / 8);
+		glUniformMatrix4fv(proj_mat_location, 1, GL_FALSE, model2.projection.m);
+		glUniformMatrix4fv(view_mat_location, 1, GL_FALSE, model2.view.m);
+		glUniformMatrix4fv(model_location, 1, GL_FALSE, model2.model.m);
+		glUniformMatrix4fv(ortho_mat_location, 1, GL_FALSE, model2.ortho.m);
+		glDrawArrays(GL_TRIANGLES, 0, blenderObject.getNumVertices());
+		//glDrawArrays(GL_TRIANGLES, 0, teapot_vertex_count);
+	}
+
     glutSwapBuffers();
 }
 
@@ -217,7 +220,6 @@ void updateScene() {
 	if (delta > 0.03f)
 		delta = 0.03f;
 	last_time = curr_time;
-	lookat = look_at(vec3(x_mouse, y_mouse, 1.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0, 1, 0));
 	model1.model = look_at(vec3(x_mouse, y_mouse, 1.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0, 1, 0));
 	// Draw the next frame
 	glutPostRedisplay();
@@ -263,6 +265,7 @@ int main(int argc, char** argv){
 	glutDisplayFunc(display);
 	glutIdleFunc(updateScene);
 	glutKeyboardFunc(keypress);
+	glutSpecialFunc(special_keypress);
 	glutPassiveMotionFunc(mouse_move);
 
 	 // A call to glewInit() must be done after glut is initialized!

@@ -29,19 +29,22 @@ GLuint shaderProgramID;
 // Variables referenced in header files
 float x_mouse;
 float y_mouse;
+float z_mouse = 1.0f;
+float x_pos;
+float z_pos;
 
-unsigned int teapot_vao = 0;
+unsigned int object1Vao = 0;
 
 // ViewPort Dimensions
-int width = 800.0;
-int height = 600.0;
+const int width = 800.0;
+const int height = 600.0;
 
 // Shader Variables
 GLuint vertexPositionLocation;
 GLuint vertexNormalsLocation;
 
 // Model Load Variables
-BlenderObj blenderObject("../rami_chan.obj");
+BlenderObj blenderObject1("../monke.obj");
 ProjectionMatrices model1;
 ProjectionMatrices model2;
 bool model2ToggleView = true;
@@ -140,7 +143,7 @@ GLuint CompileShaders()
 
 // VBO Functions - click on + to expand
 #pragma region VBO_FUNCTIONS
-void generateObjectBufferTeapot () {
+void generateObjectBuffer () {
 	GLuint vp_vbo = 0;
 
 	vertexPositionLocation = glGetAttribLocation(shaderProgramID, "vertex_position");
@@ -148,16 +151,16 @@ void generateObjectBufferTeapot () {
 	
 	glGenBuffers (1, &vp_vbo);
 	glBindBuffer (GL_ARRAY_BUFFER, vp_vbo);
-	glBufferData(GL_ARRAY_BUFFER, 3 * blenderObject.getNumVertices() * sizeof(float), blenderObject.getVertices(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 3 * blenderObject1.getNumVertices() * sizeof(float), blenderObject1.getVertices(), GL_STATIC_DRAW);
 	//glBufferData (GL_ARRAY_BUFFER, 3 * teapot_vertex_count * sizeof (float), teapot_vertex_points, GL_STATIC_DRAW);
 	GLuint vn_vbo = 0;
 	glGenBuffers (1, &vn_vbo);
 	glBindBuffer (GL_ARRAY_BUFFER, vn_vbo);
-	glBufferData(GL_ARRAY_BUFFER, 3 * blenderObject.getNumVertices() * sizeof(float), blenderObject.getNormals() , GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 3 * blenderObject1.getNumVertices() * sizeof(float), blenderObject1.getNormals() , GL_STATIC_DRAW);
 	//glBufferData (GL_ARRAY_BUFFER, 3 * teapot_vertex_count * sizeof (float), teapot_normals, GL_STATIC_DRAW);
   
-	glGenVertexArrays (1, &teapot_vao);
-	glBindVertexArray (teapot_vao);
+	glGenVertexArrays (1, &object1Vao);
+	glBindVertexArray (object1Vao);
 
 	glEnableVertexAttribArray (vertexPositionLocation);
 	glBindBuffer (GL_ARRAY_BUFFER, vp_vbo);
@@ -189,22 +192,25 @@ void display(){
 	// Main Viewport
 	glViewport (0, 0, width, height);
 	//glScissor(0, 0, width, height);
+	// Moving Model based on updated values
+	model1.view = translate(identity_mat4(), vec3(0.0 + x_pos, 0.0, -2.0 + z_pos));
 	glUniformMatrix4fv (proj_mat_location, 1, GL_FALSE, model1.projection.m);
 	glUniformMatrix4fv (view_mat_location, 1, GL_FALSE, model1.view.m);
 	glUniformMatrix4fv (model_location, 1, GL_FALSE, model1.model.m);
 	glUniformMatrix4fv(ortho_mat_location, 1, GL_FALSE, model1.ortho.m);
-	glDrawArrays(GL_TRIANGLES, 0, blenderObject.getNumVertices());
+	glDrawArrays(GL_TRIANGLES, 0, blenderObject1.getNumVertices());
 	//glDrawArrays (GL_TRIANGLES, 0, teapot_vertex_count);
 
 	// Map Viewport
 	if (model2ToggleView == true) {
 		glViewport(0, 0, width / 6, height / 6);
 		//glScissor(0, 0, width / 8, height / 8);
+		model2.view = translate(identity_mat4(), vec3(0.0f - x_pos, 0.0 + z_pos, -2.0));
 		glUniformMatrix4fv(proj_mat_location, 1, GL_FALSE, model2.projection.m);
 		glUniformMatrix4fv(view_mat_location, 1, GL_FALSE, model2.view.m);
 		glUniformMatrix4fv(model_location, 1, GL_FALSE, model2.model.m);
 		glUniformMatrix4fv(ortho_mat_location, 1, GL_FALSE, model2.ortho.m);
-		glDrawArrays(GL_TRIANGLES, 0, blenderObject.getNumVertices());
+		glDrawArrays(GL_TRIANGLES, 0, blenderObject1.getNumVertices());
 		//glDrawArrays(GL_TRIANGLES, 0, teapot_vertex_count);
 	}
 
@@ -220,7 +226,8 @@ void updateScene() {
 	if (delta > 0.03f)
 		delta = 0.03f;
 	last_time = curr_time;
-	model1.model = look_at(vec3(x_mouse, y_mouse, 1.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0, 1, 0));
+	// Moving Camera
+	model1.model = look_at(vec3(x_mouse, y_mouse, z_mouse), vec3(0.0f, 0.0f, 0.0f), vec3(0, 1, 0));
 	// Draw the next frame
 	glutPostRedisplay();
 }
@@ -228,20 +235,11 @@ void updateScene() {
 
 void init()
 {
-	// Create 3 vertices that make up a triangle that fits on the viewport 
-	GLfloat vertices[] = {-1.0f, -1.0f, 0.0f, 1.0,
-			1.0f, -1.0f, 0.0f, 1.0, 
-			0.0f, 1.0f, 0.0f, 1.0};
-	// Create a color array that identfies the colors of each vertex (format R, G, B, A)
-	GLfloat colors[] = {0.0f, 1.0f, 0.0f, 1.0f,
-			1.0f, 0.0f, 0.0f, 1.0f,
-			0.0f, 0.0f, 1.0f, 1.0f};
 	// Set up the shaders
 	GLuint shaderProgramID = CompileShaders();
 
-	// load teapot mesh into a vertex buffer array
-	generateObjectBufferTeapot ();
-	
+	// load mesh into a vertex buffer array
+	generateObjectBuffer();
 }
 
 int main(int argc, char** argv){
@@ -254,19 +252,22 @@ int main(int argc, char** argv){
 
 	// Model 2 View
 	model2 = model1;
-	model2.ortho = ortho(-1.2f, 1.2f, -1.2f, 1.2f, -1.2f, 1.2f);
 	model2.model = rotate_x_deg(identity_mat4(), 90.0f);
+	model2.ortho = ortho(-1.2f, 1.2f, -1.2f, 1.2f, -1.2f, 1.2f);
+
 	// Set up the window
 	glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);
     glutInitWindowSize(width, height);
     glutCreateWindow("Viewport Teapots");
+
 	// Tell glut where the display function is
 	glutDisplayFunc(display);
 	glutIdleFunc(updateScene);
-	glutKeyboardFunc(keypress);
-	glutSpecialFunc(special_keypress);
-	glutPassiveMotionFunc(mouse_move);
+	glutKeyboardFunc(keyPress);
+	glutSpecialFunc(specialKeypress);
+	glutPassiveMotionFunc(mouseMove);
+	glutMouseWheelFunc(mouseWheel);
 
 	 // A call to glewInit() must be done after glut is initialized!
 	glewExperimental = GL_TRUE; //for non-lab machines, this line gives better modern GL support
@@ -276,9 +277,12 @@ int main(int argc, char** argv){
       fprintf(stderr, "Error: '%s'\n", glewGetErrorString(res));
       return 1;
     }
+
 	// Set up your objects and shaders
 	init();
+	
 	// Begin infinite event loop
 	glutMainLoop();
-    return 0;
+    
+	return 0;
 }

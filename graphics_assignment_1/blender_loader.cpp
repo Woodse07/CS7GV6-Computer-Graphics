@@ -97,7 +97,7 @@ BlenderObj::BlenderObj(std::string filename) {
 	numvertices = floatVertices.size() / 3;
 	std::cout << "    Face Vertices: " << floatVertices.size() << std::endl;
 	std::cout << "    Face Textures: " << floatTex.size() << std::endl;
-	std::cout << "     Face Normals:: " << floatNormals.size() << std::endl;
+	std::cout << "     Face Normals: " << floatNormals.size() << std::endl;
 	vertices.clear();
 	texcoords.clear();
 	normals.clear();

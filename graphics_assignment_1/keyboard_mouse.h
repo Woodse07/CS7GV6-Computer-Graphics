@@ -9,17 +9,29 @@
 #include <iostream>
 
 
-// x_mouse, y_mouse variables for mouse view
-extern float x_mouse;
-extern float y_mouse;
-extern int width;
-extern int height;
+// Extern variables called in main.cpp
+extern const int height;
+extern const int width;
+
+// Second viewport toggle switch
 extern bool model2ToggleView;
 
-void keypress(unsigned char key, int xmouse, int ymouse);
+// Camera Position
+extern float x_mouse;
+extern float y_mouse;
+extern float z_mouse;
 
-void special_keypress(int key, int x, int y);
+// Model Position X, Z
+extern float x_pos;
+extern float z_pos;
 
-void mouse_move(int x, int y);
+// keyboard/mouse input function declarations
+void keyPress(unsigned char key, int xmouse, int ymouse);
+
+void mouseMove(int x, int y);
+
+void mouseWheel(int key, int wheeldir, int x, int y);
+
+void specialKeypress(int key, int x, int y);
 
 #endif //KEYBOARD_MOUSE_H_

@@ -1,3 +1,6 @@
+#ifndef BLENDER_LOADER_H_
+#define BLENDER_LOADER_H_
+
 #include <iostream>
 #include <string> 
 #include <fstream>
@@ -7,9 +10,6 @@
 #include <string>
 #include <GL/glew.h>
 #include "maths_funcs.h"
-
-
-void load_obj(std::string filename, std::vector<vec4>& vertices, std::vector<vec3>& normals, std::vector<GLushort>& elements);
 
 struct vertex {
 	std::vector<float> v;
@@ -56,18 +56,24 @@ struct face {
 	std::vector<int> normal;
 };
 
-class blenderObj {
+class BlenderObj {
 private:
 	std::vector<vertex> vertices;
 	std::vector<vertex> normals;
 	std::vector<vertex> texcoords;
 	std::vector<vertex> parameters;
 	std::vector<face> faces;
+	int numvertices;
+	std::vector<float> floatVertices;
+	std::vector<float> floatNormals;
+	std::vector<float> floatTex;
 protected:
 public:
-	int numvertices;
-	std::vector<float> float_vertices;
-	std::vector<float> float_normals;
-	std::vector<float> float_tex;
-	blenderObj(std::string filename);
+	BlenderObj(std::string filename);
+	float* getVertices();
+	float* getNormals();
+	float* getTexcoords();
+	int getNumVertices();
 };
+
+#endif  // BLENDER_LOADER_H_

@@ -1,6 +1,6 @@
 #include <blender_loader.h>
 
-blenderObj::blenderObj(std::string filename) {
+BlenderObj::BlenderObj(std::string filename) {
 	std::ifstream ifs(filename.c_str(), std::ifstream::in);
 	std::string line, key;
 	while (ifs.good() && !ifs.eof() && std::getline(ifs, line)) {
@@ -78,28 +78,44 @@ blenderObj::blenderObj(std::string filename) {
 	std::cout << "            Normals: " << normals.size() << std::endl;
 	std::cout << "              Faces: " << faces.size() << std::endl << std::endl;
 
-	for (int faces_index = 0; faces_index < faces.size(); faces_index++) {
-		for (int vertex_index = 0; vertex_index < faces[faces_index].vertex.size(); vertex_index++) {
-			float_vertices.push_back(vertices[faces[faces_index].vertex[vertex_index]].v[0]);
-			float_vertices.push_back(vertices[faces[faces_index].vertex[vertex_index]].v[1]);
-			float_vertices.push_back(vertices[faces[faces_index].vertex[vertex_index]].v[2]);
+	for (int facesIndex = 0; facesIndex < faces.size(); facesIndex++) {
+		for (int vertex_index = 0; vertex_index < faces[facesIndex].vertex.size(); vertex_index++) {
+			floatVertices.push_back(vertices[faces[facesIndex].vertex[vertex_index]].v[0]);
+			floatVertices.push_back(vertices[faces[facesIndex].vertex[vertex_index]].v[1]);
+			floatVertices.push_back(vertices[faces[facesIndex].vertex[vertex_index]].v[2]);
+		}	
+		for (int textureIndex = 0; textureIndex < faces[textureIndex].texture.size(); textureIndex++) {
+			floatTex.push_back(texcoords[faces[facesIndex].texture[textureIndex]].v[0]);
+			floatTex.push_back(texcoords[faces[facesIndex].texture[textureIndex]].v[1]);
 		}
-		for (int texture_index = 0; texture_index < faces[texture_index].texture.size(); texture_index++) {
-			float_tex.push_back(texcoords[faces[faces_index].texture[texture_index]].v[0]);
-			float_tex.push_back(texcoords[faces[faces_index].texture[texture_index]].v[1]);
-		}
-		for (int normal_index = 0; normal_index < faces[normal_index].normal.size(); normal_index++) {
-			float_normals.push_back(normals[faces[faces_index].normal[normal_index]].v[0]);
-			float_normals.push_back(normals[faces[faces_index].normal[normal_index]].v[1]);
-			float_normals.push_back(normals[faces[faces_index].normal[normal_index]].v[2]);
+		for (int normalIndex = 0; normalIndex < faces[normalIndex].normal.size(); normalIndex++) {
+			floatNormals.push_back(normals[faces[facesIndex].normal[normalIndex]].v[0]);
+			floatNormals.push_back(normals[faces[facesIndex].normal[normalIndex]].v[1]);
+			floatNormals.push_back(normals[faces[facesIndex].normal[normalIndex]].v[2]);
 		}
 	}
-	numvertices = float_vertices.size() / 3;
-	std::cout << "    Face Vertices: " << float_vertices.size() << std::endl;
-	std::cout << "    Face Textures: " << float_normals.size() << std::endl;
-	std::cout << "     Face Normals:: " << float_normals.size() << std::endl;
+	numvertices = floatVertices.size() / 3;
+	std::cout << "    Face Vertices: " << floatVertices.size() << std::endl;
+	std::cout << "    Face Textures: " << floatTex.size() << std::endl;
+	std::cout << "     Face Normals:: " << floatNormals.size() << std::endl;
 	vertices.clear();
 	texcoords.clear();
 	normals.clear();
 	faces.clear();
+}
+
+float* BlenderObj::getVertices() {
+	return floatVertices.data();
+}
+
+float* BlenderObj::getNormals() {
+	return floatNormals.data();
+}
+
+float* BlenderObj::getTexcoords() {
+	return floatTex.data();
+}
+
+int BlenderObj::getNumVertices() {
+	return numvertices;
 }

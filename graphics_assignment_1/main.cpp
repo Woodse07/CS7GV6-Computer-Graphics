@@ -13,10 +13,12 @@
 #include <string> 
 
 // Custom Libraries
-#include "blender_loader.h"
-#include "keyboard_mouse_input.h"
-#include "maths_funcs.h" //Anton's math class
+#include <blender_loader.h>
+#include <keyboard_mouse.h>
+#include <maths_funcs.h> //Anton's math class
+#include <projection_matrices.h>
 #include "teapot.h" // teapot mesh
+
 
 // Macro for indexing vertex buffer
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
@@ -29,12 +31,12 @@ float x_mouse;
 float y_mouse;
 
 unsigned int teapot_vao = 0;
-int width = 1600.0;
+int width = 800.0;
 int height = 600.0;
-GLuint vertex_position_location;
-GLuint vertex_normals_location;
+GLuint vertexPositionLocation;
+GLuint vertexNormalsLocation;
 
-blenderObj blenderObject("../rami_chan.obj");
+BlenderObj blenderObject("../rami_chan.obj");
 
 // Shader Functions- click on + to expand
 #pragma region SHADER_FUNCTIONS
@@ -133,28 +135,28 @@ GLuint CompileShaders()
 void generateObjectBufferTeapot () {
 	GLuint vp_vbo = 0;
 
-	vertex_position_location = glGetAttribLocation(shaderProgramID, "vertex_position");
-	vertex_normals_location = glGetAttribLocation(shaderProgramID, "vertex_normals");
+	vertexPositionLocation = glGetAttribLocation(shaderProgramID, "vertex_position");
+	vertexNormalsLocation = glGetAttribLocation(shaderProgramID, "vertex_normals");
 	
 	glGenBuffers (1, &vp_vbo);
 	glBindBuffer (GL_ARRAY_BUFFER, vp_vbo);
-	glBufferData(GL_ARRAY_BUFFER, 3 * blenderObject.numvertices * sizeof(float), blenderObject.float_vertices.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 3 * blenderObject.getNumVertices() * sizeof(float), blenderObject.getVertices(), GL_STATIC_DRAW);
 	//glBufferData (GL_ARRAY_BUFFER, 3 * teapot_vertex_count * sizeof (float), teapot_vertex_points, GL_STATIC_DRAW);
 	GLuint vn_vbo = 0;
 	glGenBuffers (1, &vn_vbo);
 	glBindBuffer (GL_ARRAY_BUFFER, vn_vbo);
-	glBufferData(GL_ARRAY_BUFFER, 3 * blenderObject.numvertices * sizeof(float), blenderObject.float_normals.data() , GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 3 * blenderObject.getNumVertices() * sizeof(float), blenderObject.getNormals() , GL_STATIC_DRAW);
 	//glBufferData (GL_ARRAY_BUFFER, 3 * teapot_vertex_count * sizeof (float), teapot_normals, GL_STATIC_DRAW);
   
 	glGenVertexArrays (1, &teapot_vao);
 	glBindVertexArray (teapot_vao);
 
-	glEnableVertexAttribArray (vertex_position_location);
+	glEnableVertexAttribArray (vertexPositionLocation);
 	glBindBuffer (GL_ARRAY_BUFFER, vp_vbo);
-	glVertexAttribPointer (vertex_position_location, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-	glEnableVertexAttribArray (vertex_normals_location);
+	glVertexAttribPointer (vertexPositionLocation, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+	glEnableVertexAttribArray (vertexNormalsLocation);
 	glBindBuffer (GL_ARRAY_BUFFER, vn_vbo);
-	glVertexAttribPointer (vertex_normals_location, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+	glVertexAttribPointer (vertexNormalsLocation, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 }
 #pragma endregion VBO_FUNCTIONS
 
@@ -171,33 +173,37 @@ void display(){
 	int matrix_location = glGetUniformLocation (shaderProgramID, "model");
 	int view_mat_location = glGetUniformLocation (shaderProgramID, "view");
 	int proj_mat_location = glGetUniformLocation (shaderProgramID, "proj");
+	int ortho_mat_location = glGetUniformLocation(shaderProgramID, "ortho");
 	mat4 lookat = look_at(vec3(x_mouse, y_mouse, 1.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0, 1, 0));
 
 	//Here is where the code for the viewport lab will go, to get you started I have drawn a t-pot in the bottom left
 	//The model transform rotates the object by 45 degrees, the view transform sets the camera at -40 on the z-axis, and the perspective projection is setup using Antons method
 
-	// Left
-	mat4 view = translate (identity_mat4 (), vec3 (0.0, 0.0, -2.0));
-	mat4 persp_proj = perspective(90.0, (float)(width/2)/(float)height, 0.1, 100.0);
-	mat4 model = identity_mat4()*lookat;
-	glViewport (0, 0, width/2, height);
-	glUniformMatrix4fv (proj_mat_location, 1, GL_FALSE, persp_proj.m);
-	glUniformMatrix4fv (view_mat_location, 1, GL_FALSE, view.m);
-	glUniformMatrix4fv (matrix_location, 1, GL_FALSE, model.m);
-	glDrawArrays(GL_TRIANGLES, 0, blenderObject.numvertices);
+	// Main Viewport
+	mat4 view_mat = translate (identity_mat4 (), vec3 (0.0, 0.0, -2.0));
+	mat4 persp_mat = perspective(90.0, (float)(width)/(float)height, 0.1, 100.0);
+	mat4 model_mat = identity_mat4()*lookat;
+	mat4 ortho_mat = identity_mat4();
+	glViewport (0, 0, width, height);
+	//glScissor(0, 0, width, height);
+	glUniformMatrix4fv (proj_mat_location, 1, GL_FALSE, persp_mat.m);
+	glUniformMatrix4fv (view_mat_location, 1, GL_FALSE, view_mat.m);
+	glUniformMatrix4fv (matrix_location, 1, GL_FALSE, model_mat.m);
+	glUniformMatrix4fv(ortho_mat_location, 1, GL_FALSE, ortho_mat.m);
+	glDrawArrays(GL_TRIANGLES, 0, blenderObject.getNumVertices());
 	//glDrawArrays (GL_TRIANGLES, 0, teapot_vertex_count);
 
-	// Right
-	mat4 ortho_top = ortho(-1.2f, 1.2f, -1.2f, 1.2f, -1.2f, 1.2f);
-	model = identity_mat4();
-	model = ortho_top * rotate_x_deg(model, -90.0f);
-	glViewport(width/2, 0, width/2, height);
-	glUniformMatrix4fv(proj_mat_location, 1, GL_FALSE, persp_proj.m);
-	glUniformMatrix4fv(view_mat_location, 1, GL_FALSE, view.m);
-	glUniformMatrix4fv(matrix_location, 1, GL_FALSE, model.m);
-	glDrawArrays(GL_TRIANGLES, 0, blenderObject.numvertices);
+	// Map Viewport
+	ortho_mat = ortho(-1.2f, 1.2f, -1.2f, 1.2f, -1.2f, 1.2f);
+	model_mat = rotate_x_deg(identity_mat4(), 90.0f);
+	glViewport(0, 0, width/6, height/6);
+	//glScissor(0, 0, width / 8, height / 8);
+	glUniformMatrix4fv(proj_mat_location, 1, GL_FALSE, persp_mat.m);
+	glUniformMatrix4fv(view_mat_location, 1, GL_FALSE, view_mat.m);
+	glUniformMatrix4fv(matrix_location, 1, GL_FALSE, model_mat.m);
+	glUniformMatrix4fv(ortho_mat_location, 1, GL_FALSE, ortho_mat.m);
+	glDrawArrays(GL_TRIANGLES, 0, blenderObject.getNumVertices());
 	//glDrawArrays(GL_TRIANGLES, 0, teapot_vertex_count);
-
     glutSwapBuffers();
 }
 

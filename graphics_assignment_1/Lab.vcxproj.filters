@@ -21,10 +21,13 @@
     <ClCompile Include="maths_funcs.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="keyboard_mouse_input.cpp">
+    <ClCompile Include="blender_loader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="blender_loader.cpp">
+    <ClCompile Include="keyboard_mouse.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="projection_matrices.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -35,10 +38,13 @@
     <ClInclude Include="teapot.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="keyboard_mouse_input.h">
+    <ClInclude Include="blender_loader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="blender_loader.h">
+    <ClInclude Include="keyboard_mouse.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="projection_matrices.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

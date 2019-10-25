@@ -52,14 +52,14 @@ GLuint vertexNormalsLocation;
 // Light Position
 GLuint lightPositionLocation;
 vec3 lightPositionDirection = vec3(1, 0, 0);
-vec3 lightPosition = vec3(10, 10, 10);
+vec3 lightPosition = vec3(0, 100, 0);
 // View Position
 GLuint viewPositionLocation;
 // Ambient and Specular Lighting Strength
 GLuint ambientStrengthLocation;
 float ambientStrength = 1.0f;
 GLuint specularStrengthLocation;
-float specularStrength = 1.0f;
+float specularStrength = 0.5f;
 
 // Model Load Variables
 BlenderObj blenderObject1("../meshes/monkey.obj");
@@ -286,8 +286,8 @@ void updateScene() {
 	// Viewport Model 2 Hierarchy
 	// Left Model2 Definition
 	model2Left = scale(identity_mat4(), vec3(0.2f, 0.2f, 0.2f));
-	model2Left = rotate_x_deg(model2Left, rightModelXDeg);
-	model2Left = rotate_y_deg(model2Left, rightModelYDeg);
+	model2Left = rotate_x_deg(model2Left, leftModelXDeg);
+	model2Left = rotate_y_deg(model2Left, leftModelYDeg);
 	model2Left = translate(model2Left, vec3(-1.5f, 0.0f, 0.0f));
 	model2Left = model2.model * model2Left;
 	// Right Model2 Definition

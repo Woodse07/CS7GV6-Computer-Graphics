@@ -4,6 +4,7 @@ in vec3 vertexPosition;
 in vec3 vertexNormals;
 
 out vec3 nEye;
+out vec3 fragPos;
 out vec3 vsNormals;
 out vec3 vsPosition;
 
@@ -17,8 +18,9 @@ uniform float ambientStr;
 uniform float specularStr;
 
 void main(){
+	fragPos = vec3(model * vec4(vertexPosition, 1.0));
 	nEye = (view * vec4 (vertexNormals, 0.0)).xyz;
-	gl_Position =  proj * view * model * ortho* vec4 (vertexPosition, 1.0);
 	vsNormals = vertexNormals;
 	vsPosition = vertexPosition;
+	gl_Position =  proj * view * model * ortho* vec4 (vertexPosition, 1.0);
 }

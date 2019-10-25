@@ -25,6 +25,12 @@ extern float z_mouse;
 extern float x_pos;
 extern float z_pos;
 
+// Secondary Model RotationDegree Y
+extern float leftModelXDeg;
+extern float rightModelXDeg;
+extern float leftModelYDeg;
+extern float rightModelYDeg;
+
 // Light Intensity
 extern float ambientStrength;
 extern float specularStrength;

@@ -18,6 +18,16 @@ void keyPress(unsigned char key, int xmouse, int ymouse) {
 			break;
 		// Attack mode or 'Deploy hierarchical transforms'
 		case('q'):
+			leftModelYDeg -= 1.0f;
+			break;
+		case('e'):
+			rightModelYDeg += 1.0f;
+			break;
+		case('z'):
+			leftModelXDeg += 1.0f;
+			break;
+		case('c'):
+			rightModelXDeg += 1.0f;
 			break;
 		// Reset Condition
 		case('R'):
@@ -26,6 +36,10 @@ void keyPress(unsigned char key, int xmouse, int ymouse) {
 			z_pos = 0.0f;
 			ambientStrength = 1.0f;
 			specularStrength = 1.0f;
+			leftModelYDeg = 0;
+			rightModelYDeg = 0;
+			leftModelXDeg = 0;
+			rightModelXDeg = 0;
 			break;
 	}
 };

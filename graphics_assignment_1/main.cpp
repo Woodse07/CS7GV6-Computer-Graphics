@@ -31,6 +31,10 @@ GLuint shaderProgramID;
 float x_mouse;
 float y_mouse;
 float z_mouse = 1.0f;
+float leftModelYDeg;
+float rightModelYDeg;
+float leftModelXDeg;
+float rightModelXDeg;
 float x_pos;
 float z_pos;
 
@@ -265,15 +269,34 @@ void updateScene() {
 		delta = 0.03f;
 	last_time = curr_time;
 	// Moving Camera
-	model1.model = look_at(vec3(0, 0, z_mouse), vec3(x_mouse, y_mouse, 0.0f), vec3(0, 1, 0));
-	// Left Model1 Definition
+	model1.model = look_at(vec3(x_mouse, y_mouse, z_mouse), vec3(0.0f, 0.0f, 0.0f), vec3(0, 1, 0));
+	// Viewport Model 1 Hierarchy
+	// Left Model1 Update
 	model1Left = scale(identity_mat4(), vec3(0.2f, 0.2f, 0.2f));
+	model1Left = rotate_x_deg(model1Left, leftModelXDeg);
+	model1Left = rotate_y_deg(model1Left, leftModelYDeg);
 	model1Left = translate(model1Left, vec3(-1.5f, 0.0f, 0.0f));
 	model1Left = model1.model * model1Left;
-	// Right Model1 Definition
+	// Right Model1 Update
 	model1Right = scale(identity_mat4(), vec3(0.2f, 0.2f, 0.2f));
+	model1Right = rotate_x_deg(model1Right, rightModelXDeg);
+	model1Right = rotate_y_deg(model1Right, rightModelYDeg);
 	model1Right = translate(model1Right, vec3(+1.5f, 0.0f, 0.0f));
 	model1Right = model1.model * model1Right;
+	// Viewport Model 2 Hierarchy
+	// Left Model2 Definition
+	model2Left = scale(identity_mat4(), vec3(0.2f, 0.2f, 0.2f));
+	model2Left = rotate_x_deg(model2Left, rightModelXDeg);
+	model2Left = rotate_y_deg(model2Left, rightModelYDeg);
+	model2Left = translate(model2Left, vec3(-1.5f, 0.0f, 0.0f));
+	model2Left = model2.model * model2Left;
+	// Right Model2 Definition
+	model2Right = scale(identity_mat4(), vec3(0.2f, 0.2f, 0.2f));
+	model2Right = rotate_x_deg(model2Right, rightModelXDeg);
+	model2Right = rotate_y_deg(model2Right, rightModelYDeg);
+	model2Right = translate(model2Right, vec3(+1.5f, 0.0f, 0.0f));
+	model2Right = model2.model * model2Right;
+	
 	lightPositionUpdate(lightPositionDirection, lightPosition);
 	glutPostRedisplay();
 }
@@ -295,32 +318,16 @@ int main(int argc, char** argv){
 	model1.view = translate(identity_mat4(), vec3(0.0, 0.0, -2.0));
 	model1.model = identity_mat4();
 	model1.ortho = identity_mat4();
-	// Left Model1 Definition
-	model1Left = scale(identity_mat4(), vec3(0.2f, 0.2f, 0.2f));
-	model1Left = translate(model1Left, vec3(-1.5f, 0.0f, 0.0f));
-	model1Left = model1.model * model1Left;
-	// Right Model1 Definition
-	model1Right = scale(identity_mat4(), vec3(0.2f, 0.2f, 0.2f));
-	model1Right = translate(model1Right, vec3(+1.5f, 0.0f, 0.0f));
-	model1Right = model1.model * model1Right;
 	// Model 2 View
 	model2 = model1;
 	model2.model = rotate_x_deg(identity_mat4(), 90.0f);
 	model2.ortho = ortho(-1.2f, 1.2f, -1.2f, 1.2f, -1.2f, 1.2f);
-	// Left Model2 Definition
-	model2Left = scale(model2Left, vec3(0.2f, 0.2f, 0.2f));
-	model2Left = translate(model2Left, vec3(-1.5f, 0.0f, 0.0f));
-	model2Left = model2.model * model2Left;
-	// Right Model2 Definition
-	model2Right = scale(model2Right, vec3(0.2f, 0.2f, 0.2f));
-	model2Right = translate(model2Right, vec3(+1.5f, 0.0f, 0.0f));
-	model2Right = model2.model * model2Right;
 
 	// Set up the window
 	glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);
     glutInitWindowSize(width, height);
-    glutCreateWindow("Viewport Teapots");
+    glutCreateWindow("Viewport Gohdan Monkeys");
 
 	// Tell glut where the display function is
 	glutDisplayFunc(display);

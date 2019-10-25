@@ -14,7 +14,7 @@ uniform vec3 viewPos;
 uniform float ambientStr;
 uniform float specularStr;
 
-const vec3 ambientColor = vec3(0.0, 0.0, 0.0);
+const vec3 ambientColor = vec3(1.0, 0.0, 0.0);
 const vec3 diffuseColor = vec3(0.5, 0.0, 0.0);
 const vec3 specColor = vec3(1.0, 1.0, 1.0);
 
@@ -32,5 +32,5 @@ void main(){
 	vec3 viewDir = normalize(viewPos - fragPos);
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32); 
 	vec3 specular = spec * specularStr * specColor;
-	fragColour = vec4(ambient + diffuse + specular, 1.0);
+	fragColour = vec4(nEye*ambient + diffuse + specular, 1.0);
 }

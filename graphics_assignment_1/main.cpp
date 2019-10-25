@@ -286,14 +286,14 @@ void updateScene() {
 	// Viewport Model 2 Hierarchy
 	// Left Model2 Definition
 	model2Left = scale(identity_mat4(), vec3(0.2f, 0.2f, 0.2f));
-	model2Left = rotate_x_deg(model2Left, leftModelXDeg);
-	model2Left = rotate_y_deg(model2Left, leftModelYDeg);
+	model2Left = rotate_x_deg(model2Left, -rightModelXDeg);
+	model2Left = rotate_y_deg(model2Left, rightModelYDeg);
 	model2Left = translate(model2Left, vec3(-1.5f, 0.0f, 0.0f));
 	model2Left = model2.model * model2Left;
 	// Right Model2 Definition
 	model2Right = scale(identity_mat4(), vec3(0.2f, 0.2f, 0.2f));
-	model2Right = rotate_x_deg(model2Right, rightModelXDeg);
-	model2Right = rotate_y_deg(model2Right, rightModelYDeg);
+	model2Right = rotate_x_deg(model2Right, -leftModelXDeg);
+	model2Right = rotate_y_deg(model2Right, leftModelYDeg);
 	model2Right = translate(model2Right, vec3(+1.5f, 0.0f, 0.0f));
 	model2Right = model2.model * model2Right;
 	

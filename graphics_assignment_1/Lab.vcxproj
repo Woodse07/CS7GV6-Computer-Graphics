@@ -136,8 +136,10 @@
     <ClCompile Include="maths_funcs.cpp" />
     <ClCompile Include="blender_loader.cpp" />
     <ClCompile Include="projection_matrices.cpp" />
+    <ClCompile Include="light_position.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="light_position.h" />
     <ClInclude Include="projection_matrices.h" />
     <ClInclude Include="keyboard_mouse.h" />
     <ClInclude Include="blender_loader.h" />
@@ -145,8 +147,8 @@
     <ClInclude Include="teapot.h" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="Shaders\simpleFragmentShader.txt" />
-    <Text Include="Shaders\simpleVertexShader.txt" />
+    <Text Include="Shaders\simpleFragmentShader.glsl" />
+    <Text Include="Shaders\simpleVertexShader.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

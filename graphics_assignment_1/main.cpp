@@ -15,6 +15,7 @@
 // Custom Libraries
 #include <blender_loader.h>
 #include <keyboard_mouse.h>
+#include <light_position.h>
 #include <maths_funcs.h> //Anton's math class
 #include <projection_matrices.h>
 #include "teapot.h" // teapot mesh
@@ -33,6 +34,7 @@ float z_mouse = 1.0f;
 float x_pos;
 float z_pos;
 
+// VAO Variables
 unsigned int object1Vao = 0;
 
 // ViewPort Dimensions
@@ -45,7 +47,8 @@ GLuint vertexPositionLocation;
 GLuint vertexNormalsLocation;
 // Light Position
 GLuint lightPositionLocation;
-vec3 lightPosition = vec3(1, 1, -10);
+vec3 lightPositionDirection = vec3(1, 0, 0);
+vec3 lightPosition = vec3(10, 10, 10);
 // View Position
 GLuint viewPositionLocation;
 // Ambient and Specular Lighting Strength
@@ -55,9 +58,16 @@ GLuint specularStrengthLocation;
 float specularStrength = 1.0f;
 
 // Model Load Variables
-BlenderObj blenderObject1("../monke.obj");
+BlenderObj blenderObject1("../meshes/monkey.obj");
+// Viewport 1 Variables
 ProjectionMatrices model1;
+mat4 model1Left = identity_mat4();
+mat4 model1Right = identity_mat4();
+// Viewport 2 Variables
 ProjectionMatrices model2;
+mat4 model2Left = identity_mat4();
+mat4 model2Right = identity_mat4();
+// Viewport 2 Toggle View
 bool model2ToggleView = true;
 
 // Shader Functions- click on + to expand
@@ -118,8 +128,8 @@ GLuint CompileShaders()
     }
 
 	// Create two shader objects, one for the vertex, and one for the fragment shader
-    AddShader(shaderProgramID, "../Shaders/simpleVertexShader.txt", GL_VERTEX_SHADER);
-    AddShader(shaderProgramID, "../Shaders/simpleFragmentShader.txt", GL_FRAGMENT_SHADER);
+    AddShader(shaderProgramID, "../Shaders/simpleVertexShader.glsl", GL_VERTEX_SHADER);
+    AddShader(shaderProgramID, "../Shaders/simpleFragmentShader.glsl", GL_FRAGMENT_SHADER);
 
     GLint Success = 0;
     GLchar ErrorLog[1024] = { 0 };
@@ -192,7 +202,7 @@ void display(){
 	// tell GL to only draw onto a pixel if the shape is closer to the viewer
 	glEnable (GL_DEPTH_TEST); // enable depth-testing
 	glDepthFunc (GL_LESS); // depth-testing interprets a smaller value as "closer"
-	glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
+	glClearColor (0.5f, 0.5f, 0.5f, 1.0f);
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glUseProgram (shaderProgramID);
 
@@ -207,7 +217,6 @@ void display(){
 
 	// Main Viewport
 	glViewport (0, 0, width, height);
-	//glScissor(0, 0, width, height);
 	// Moving Model based on updated values
 	model1.view = translate(identity_mat4(), vec3(0.0 + x_pos, 0.0, -2.0 + z_pos));
 	glUniformMatrix4fv (proj_mat_location, 1, GL_FALSE, model1.projection.m);
@@ -215,9 +224,14 @@ void display(){
 	glUniformMatrix4fv (model_location, 1, GL_FALSE, model1.model.m);
 	glUniformMatrix4fv(ortho_mat_location, 1, GL_FALSE, model1.ortho.m);
 	glDrawArrays(GL_TRIANGLES, 0, blenderObject1.getNumVertices());
-	//glDrawArrays (GL_TRIANGLES, 0, teapot_vertex_count);
+	// Model 1 Left
+	glUniformMatrix4fv(model_location, 1, GL_FALSE, model1Left.m);
+	glDrawArrays(GL_TRIANGLES, 0, blenderObject1.getNumVertices());
+	// Model 1 Right
+	glUniformMatrix4fv(model_location, 1, GL_FALSE, model1Right.m);
+	glDrawArrays(GL_TRIANGLES, 0, blenderObject1.getNumVertices());
 
-	// Map Viewport
+	//// Map Viewport
 	if (model2ToggleView == true) {
 		glViewport(0, 0, width / 6, height / 6);
 		//glScissor(0, 0, width / 8, height / 8);
@@ -227,7 +241,12 @@ void display(){
 		glUniformMatrix4fv(model_location, 1, GL_FALSE, model2.model.m);
 		glUniformMatrix4fv(ortho_mat_location, 1, GL_FALSE, model2.ortho.m);
 		glDrawArrays(GL_TRIANGLES, 0, blenderObject1.getNumVertices());
-		//glDrawArrays(GL_TRIANGLES, 0, teapot_vertex_count);
+		// Model 2 Left
+		glUniformMatrix4fv(model_location, 1, GL_FALSE, model2Left.m);
+		glDrawArrays(GL_TRIANGLES, 0, blenderObject1.getNumVertices());
+		// Model 2 Right
+		glUniformMatrix4fv(model_location, 1, GL_FALSE, model2Right.m);
+		glDrawArrays(GL_TRIANGLES, 0, blenderObject1.getNumVertices());;
 	}
 	glUniform3f(lightPositionLocation, lightPosition.v[0], lightPosition.v[1], lightPosition.v[2]);
 	glUniform3f(viewPositionLocation, x_mouse, y_mouse, z_mouse);
@@ -246,7 +265,16 @@ void updateScene() {
 		delta = 0.03f;
 	last_time = curr_time;
 	// Moving Camera
-	model1.model = look_at(vec3(x_mouse, y_mouse, z_mouse), vec3(0.0f, 0.0f, 0.0f), vec3(0, 1, 0));
+	model1.model = look_at(vec3(0, 0, z_mouse), vec3(x_mouse, y_mouse, 0.0f), vec3(0, 1, 0));
+	// Left Model1 Definition
+	model1Left = scale(identity_mat4(), vec3(0.2f, 0.2f, 0.2f));
+	model1Left = translate(model1Left, vec3(-1.5f, 0.0f, 0.0f));
+	model1Left = model1.model * model1Left;
+	// Right Model1 Definition
+	model1Right = scale(identity_mat4(), vec3(0.2f, 0.2f, 0.2f));
+	model1Right = translate(model1Right, vec3(+1.5f, 0.0f, 0.0f));
+	model1Right = model1.model * model1Right;
+	lightPositionUpdate(lightPositionDirection, lightPosition);
 	glutPostRedisplay();
 }
 
@@ -267,11 +295,26 @@ int main(int argc, char** argv){
 	model1.view = translate(identity_mat4(), vec3(0.0, 0.0, -2.0));
 	model1.model = identity_mat4();
 	model1.ortho = identity_mat4();
-
+	// Left Model1 Definition
+	model1Left = scale(identity_mat4(), vec3(0.2f, 0.2f, 0.2f));
+	model1Left = translate(model1Left, vec3(-1.5f, 0.0f, 0.0f));
+	model1Left = model1.model * model1Left;
+	// Right Model1 Definition
+	model1Right = scale(identity_mat4(), vec3(0.2f, 0.2f, 0.2f));
+	model1Right = translate(model1Right, vec3(+1.5f, 0.0f, 0.0f));
+	model1Right = model1.model * model1Right;
 	// Model 2 View
 	model2 = model1;
 	model2.model = rotate_x_deg(identity_mat4(), 90.0f);
 	model2.ortho = ortho(-1.2f, 1.2f, -1.2f, 1.2f, -1.2f, 1.2f);
+	// Left Model2 Definition
+	model2Left = scale(model2Left, vec3(0.2f, 0.2f, 0.2f));
+	model2Left = translate(model2Left, vec3(-1.5f, 0.0f, 0.0f));
+	model2Left = model2.model * model2Left;
+	// Right Model2 Definition
+	model2Right = scale(model2Right, vec3(0.2f, 0.2f, 0.2f));
+	model2Right = translate(model2Right, vec3(+1.5f, 0.0f, 0.0f));
+	model2Right = model2.model * model2Right;
 
 	// Set up the window
 	glutInit(&argc, argv);

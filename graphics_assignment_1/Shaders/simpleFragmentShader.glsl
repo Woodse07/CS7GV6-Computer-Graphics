@@ -23,5 +23,5 @@ void main(){
 	vec3 viewDir = normalize(viewPos - vsPosition);
 	vec3 reflectDir = reflect(-lightDir, norm);
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32); 
-	fragColour = vec4 (nEye * ambientStr , 1.0);
+	fragColour = vec4 (nEye * ambientStr * diffuse , 1.0);
 }

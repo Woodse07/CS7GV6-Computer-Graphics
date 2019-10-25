@@ -30,6 +30,9 @@
     <ClCompile Include="projection_matrices.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="light_position.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="maths_funcs.h">
@@ -47,12 +50,15 @@
     <ClInclude Include="projection_matrices.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="light_position.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="Shaders\simpleFragmentShader.txt">
+    <Text Include="Shaders\simpleFragmentShader.glsl">
       <Filter>Source Files</Filter>
     </Text>
-    <Text Include="Shaders\simpleVertexShader.txt">
+    <Text Include="Shaders\simpleVertexShader.glsl">
       <Filter>Source Files</Filter>
     </Text>
   </ItemGroup>

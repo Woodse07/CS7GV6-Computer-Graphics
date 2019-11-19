@@ -30,7 +30,7 @@ GLuint shaderProgramID;
 // Variables referenced in header files
 float x_mouse;
 float y_mouse;
-float z_mouse = -1.0f;
+float z_mouse = 1.0f;
 float x_pos;
 float z_pos;
 
@@ -58,7 +58,7 @@ GLuint specularStrengthLocation;
 float specularStrength = 0.5f;
 
 // Model Load Variables
-BlenderObj blenderObject1("../meshes/ball.obj");
+BlenderObj blenderObject1("../meshes/bunny.obj");
 // Viewport 1 Variables
 ProjectionMatrices model1;
 

@@ -3,56 +3,50 @@
 in vec3 fragPos;
 in vec3 nEye;
 in vec3 vsNormals; // World Normal
-in vec3 vsLightPos;
 in vec3 vsPosition; // World Position
 
 out vec4 fragColour;
 
 uniform vec3 lightPos, viewPos;
+uniform mat4 view;
 
 uniform float ambientStr, specularStr;
 
-// Ambient Variables
-const vec3 ambientColor = vec3(0.90, 0.0, 0.20);
+const vec3 diffuseLight = vec3(0.5, 0.5, 0.5);
+const vec3 diffuseK = vec3(0.0, 1.0, 1.0);
 
-// Diffuse Variables
-const int levels = 5;
-const float scaleFactor = 1.0 / levels;
+vec3 specularLight = vec3(1.0, 1.0, 1.0);
+vec3 specularK = vec3(1.0, 1.0, 1.0);
 
-// Specular Variables
+const vec3 ambientColor = vec3(1.0, 0.0, 0.0);
+const vec3 diffuseColor = vec3(0.5, 0.0, 0.0);
 const vec3 specColor = vec3(1.0, 1.0, 1.0);
 
-// Material Properties
 const int materialShininess = 100;
 const float materialKd = 0.5;
 const float materialKs = 0.3;
 
+
+
 void main(){
 	// Global Lighting Variables
-	vec3 lightDir = normalize(lightPos - vsPosition);
-	vec3 vDir = normalize(viewPos - vsPosition);
-	vec3 H = normalize(lightDir + vDir);
 
-	// Ambient Lighting
-	vec3 ambient = ambientStr * ambientColor;
-	// Diffuse Lighting
-	vec3 diffuseColor = vec3(0.30, 0.80, 0.10);
-	float diffuse = materialKd * max(0, dot(lightDir, vsNormals));
-	diffuseColor = diffuseColor * materialKd * floor(diffuse * levels) * scaleFactor;
-	
-	// Specular Lighting
-	float specular = 0.0;
-	if (dot(lightDir, vsNormals) > 0.0) {
-		specular = materialKs * pow( max(0, dot(H, vsNormals)), materialShininess);
-	}
-	// Limit Specular
-	float specMask = (pow( dot( H, vsNormals), materialShininess) > 0.4) ? 1 : 0;
+	vec3 normal = normalize(nEye);
 
-	// Edge Detection
-	float edgeDetection = (dot(vDir, vsPosition) > 0.2) ? 1 : 0;
-	// Fragment Color
-	vec3 color = edgeDetection * (diffuseColor + specular * specMask);
-	fragColour = vec4(color, 1);
-	//fragColour = vec4(viewPos * ambient + diffuse + specular, 1.0);
+	vec3 lightPosEye = vec3(view * vec4(lightPos, 1.0));
+	vec3 lightDirEye = lightPosEye; normalize(lightPosEye - viewPos);
 
+	// Diffuse Light
+	float dotProd = max(dot(lightDirEye, nEye), 0.0);
+	dotProd = floor(dotProd * 4) / (4 + 0.25);
+	vec3 diffuse = diffuseLight * diffuseK * dotProd;
+
+	vec3 surfaceEye = normalize(-viewPos);
+	vec3 halfEye = normalize(surfaceEye + lightDirEye);
+	float dotSpec = max(dot(halfEye, nEye), 0.0);
+	dotSpec = pow(dotSpec, 50);
+	dotSpec = step(0.3, dotSpec);
+	vec3 specular = specularLight * specularK * dotSpec;
+
+	fragColour = vec4(specular + diffuse, 1.0);
 }

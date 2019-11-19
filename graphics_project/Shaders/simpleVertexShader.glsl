@@ -20,6 +20,6 @@ void main(){
 	//vsNormals = vertexNormals;
 	vsNormals = normalize(mat3(model) * vertexNormals);
 	//vsPosition = vertexPosition;
-	vsPosition = mat3(model) * vertexPosition;//careful here
+	vsPosition = mat3(model) * vertexPosition;
 	gl_Position =  proj * view * model * ortho* vec4 (vertexPosition, 1.0);
 }

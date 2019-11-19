@@ -58,7 +58,7 @@ GLuint specularStrengthLocation;
 float specularStrength = 0.5f;
 
 // Model Load Variables
-BlenderObj blenderObject1("../meshes/dragon.obj");
+BlenderObj blenderObject1("../meshes/bunny.obj");
 // Viewport 1 Variables
 ProjectionMatrices model1;
 

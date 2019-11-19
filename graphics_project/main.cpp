@@ -30,7 +30,7 @@ GLuint shaderProgramID;
 // Variables referenced in header files
 float x_mouse;
 float y_mouse;
-float z_mouse = 1.0f;
+float z_mouse = -1.0f;
 float x_pos;
 float z_pos;
 
@@ -47,8 +47,8 @@ GLuint vertexPositionLocation;
 GLuint vertexNormalsLocation;
 // Light Position
 GLuint lightPositionLocation;
-vec3 lightPositionDirection = vec3(1, 0, 0);
-vec3 lightPosition = vec3(0, 100, 0);
+//vec3 lightPositionDirection = vec3(1, 0, 0);
+vec3 lightPosition = vec3(50, 0, 50);
 // View Position
 GLuint viewPositionLocation;
 // Ambient and Specular Lighting Strength
@@ -58,7 +58,7 @@ GLuint specularStrengthLocation;
 float specularStrength = 0.5f;
 
 // Model Load Variables
-BlenderObj blenderObject1("../meshes/bunny.obj");
+BlenderObj blenderObject1("../meshes/ball.obj");
 // Viewport 1 Variables
 ProjectionMatrices model1;
 

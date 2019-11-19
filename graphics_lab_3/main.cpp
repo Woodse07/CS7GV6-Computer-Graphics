@@ -36,19 +36,23 @@ mat4 model_bl = identity_mat4();
 // Shader Functions- click on + to expand
 #pragma region SHADER_FUNCTIONS
 
-std::string readShaderSource(const std::string& fileName)
-{
-	std::ifstream file(fileName.c_str());
-	if (file.fail()) {
-		cout << "error loading shader called " << fileName;
-		exit(1);
-	}
+// Create a NULL-terminated string by reading the provided file
+char* readShaderSource(const char* shaderFile) {
+	FILE* fp = fopen(shaderFile, "rb"); //!->Why does binary flag "RB" work and not "R"... wierd msvc thing?
 
-	std::stringstream stream;
-	stream << file.rdbuf();
-	file.close();
+	if (fp == NULL) { return NULL; }
 
-	return stream.str();
+	fseek(fp, 0L, SEEK_END);
+	long size = ftell(fp);
+
+	fseek(fp, 0L, SEEK_SET);
+	char* buf = new char[size + 1];
+	fread(buf, 1, size, fp);
+	buf[size] = '\0';
+
+	fclose(fp);
+
+	return buf;
 }
 
 static void AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType)
@@ -60,8 +64,9 @@ static void AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum Shad
 		fprintf(stderr, "Error creating shader type %d\n", ShaderType);
 		exit(0);
 	}
-	std::string outShader = readShaderSource(pShaderText);
-	const char* pShaderSource = outShader.c_str();
+//	std::string outShader = readShaderSource(pShaderText);
+//	const char* pShaderSource = outShader.c_str();
+	const char* pShaderSource = readShaderSource(pShaderText);
 
 	// Bind the source code to the shader, this happens before compilation
 	glShaderSource(ShaderObj, 1, (const GLchar**)&pShaderSource, NULL);
@@ -152,7 +157,6 @@ void generateObjectBufferTeapot() {
 	glBindBuffer(GL_ARRAY_BUFFER, vn_vbo);
 	glVertexAttribPointer(vertex_normals_location, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 }
-
 
 #pragma endregion VBO_FUNCTIONS
 

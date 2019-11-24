@@ -38,7 +38,7 @@ void keyPress(unsigned char key, int xmouse, int ymouse) {
 			x_pos = 0.0f;
 			y_pos = -0.06f;
 			z_pos = 0.0f;
-			ambientStrength = 0.0f;
+			ambientStrength = 1.0f;
 			specularStrength = 1.0f;
 			modelRotationToggle = false;
 			modelRotation = 0.0f;

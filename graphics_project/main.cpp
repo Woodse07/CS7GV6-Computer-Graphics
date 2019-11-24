@@ -30,9 +30,9 @@ GLuint shaderProgramID;
 // Variables referenced in header files
 float x_mouse = 0.0f;
 float y_mouse = 0.0f;
-float z_mouse = 0.5f;
+float z_mouse = 0.3f;
 float x_pos = 0.0f;
-float y_pos = 0.0f;
+float y_pos = -0.06f;
 float z_pos = 0.0f;
 
 // VAO Variables
@@ -55,7 +55,7 @@ bool lightPositionToggle = false;
 GLuint viewPositionLocation;
 // Ambient and Specular Lighting Strength
 GLuint ambientStrengthLocation;
-float ambientStrength = 1.0f;
+float ambientStrength = 0.0f;
 GLuint specularStrengthLocation;
 float specularStrength = 0.5f;
 

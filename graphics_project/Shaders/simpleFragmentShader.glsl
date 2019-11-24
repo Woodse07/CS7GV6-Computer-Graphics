@@ -20,12 +20,10 @@ const vec3 specColor = vec3(1.0, 1.0, 1.0);
 void main() {
 	// Global Lighting Variables
 	vec4 color;
-	if (ambientStr == 0) {
-		color = vec4(0.0, 0.0, 0.0, 1.0);
-	}else if(ambientStr == 1) {
+	vec3 lightDir = normalize(lightPos - fragPos);
+	vec3 norm = normalize(vsNormals);
+	if(ambientStr == 0) {
 		float intensity;
-		vec3 lightDir = normalize(lightPos - fragPos);
-		vec3 norm = normalize(vsNormals);
 		intensity = dot(lightDir, normalize(norm));
 		if (intensity > 0.99) {
 			color = vec4(1.0, 1.0, 1.0, 1.0);
@@ -42,6 +40,21 @@ void main() {
 		else {
 			color = vec4(0.2, 0.1, 0.1, 1.0);
 		}
+	}else if (ambientStr == 1) {
+		// Diffuse Lighting
+		float diff = max(dot(norm, lightDir), 0.0);
+		vec3 diffuse = diff * diffuseColor;
+		// Specular Lighting
+		vec3 reflectDir = reflect(-lightDir, norm);
+		vec3 viewDir = normalize(viewPos - fragPos);
+		float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
+		vec3 specular = spec * specularStr * specColor;
+		color = vec4(nEye * ambientColor + diffuse + specular, 1.0);
+	} else if (ambientStr == 2) {
+		color = vec4(nEye, 1.0);
+		
+	} else if (ambientStr == 3) {
+		color = vec4(0.0, 0.0, 0.0, 1.0);
 	}
 	fragColour = color;
 

@@ -27,7 +27,7 @@ void keyPress(unsigned char key, int xmouse, int ymouse) {
 			break;
 		case('h'):
 			ambientStrength = ambientStrength + 1;
-			if (ambientStrength > 2) {
+			if (ambientStrength > 3) {
 				ambientStrength = 0;
 			}
 			std::cout << ambientStrength << std::endl;

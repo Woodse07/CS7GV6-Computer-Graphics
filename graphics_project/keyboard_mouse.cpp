@@ -25,6 +25,13 @@ void keyPress(unsigned char key, int xmouse, int ymouse) {
 		case('l'):
 			lightPositionToggle = !lightPositionToggle;
 			break;
+		case('h'):
+			ambientStrength = ambientStrength + 1;
+			if (ambientStrength > 1) {
+				ambientStrength = 0;
+			}
+			std::cout << ambientStrength << std::endl;
+			break;
 		// Reset Condition
 		case('R'):
 			z_mouse = 0.5f;
@@ -65,13 +72,6 @@ void specialKeypress(int key, int x, int y) {
 			break;
 		case(GLUT_KEY_DOWN):
 			specularStrength -= 0.02;
-			break;
-	// Ambient Lighting controls, left for down, right for up
-		case(GLUT_KEY_LEFT):
-			ambientStrength -= 0.02;
-			break;
-		case(GLUT_KEY_RIGHT):
-			ambientStrength += 0.02;
 			break;
 	}
 };

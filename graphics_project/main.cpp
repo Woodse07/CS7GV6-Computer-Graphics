@@ -29,10 +29,11 @@ GLuint shaderProgramID;
 
 // Variables referenced in header files
 float x_mouse = 0.0f;
-float y_mouse = 0.2f;
-float z_mouse = 1.0f;
-float x_pos;
-float z_pos;
+float y_mouse = 0.0f;
+float z_mouse = 0.5f;
+float x_pos = 0.0f;
+float y_pos = 0.0f;
+float z_pos = 0.0f;
 
 // VAO Variables
 unsigned int object1Vao = 0;
@@ -47,8 +48,9 @@ GLuint vertexPositionLocation;
 GLuint vertexNormalsLocation;
 // Light Position
 GLuint lightPositionLocation;
-//vec3 lightPositionDirection = vec3(1, 0, 0);
-vec3 lightPosition = vec3(0, 50, 50);
+vec3 lightPositionDirection = vec3(0, 0, 0);
+vec3 lightPosition = vec3(0, 70, 50);
+bool lightPositionToggle = false;
 // View Position
 GLuint viewPositionLocation;
 // Ambient and Specular Lighting Strength
@@ -56,6 +58,10 @@ GLuint ambientStrengthLocation;
 float ambientStrength = 1.0f;
 GLuint specularStrengthLocation;
 float specularStrength = 0.5f;
+
+// Rotation toggle and value;
+bool modelRotationToggle = false;
+float modelRotation = 0.0f;
 
 // Model Load Variables
 BlenderObj blenderObject1("../meshes/bunny.obj");
@@ -209,8 +215,6 @@ void display(){
 
 	// Main Viewport
 	glViewport (0, 0, width, height);
-	// Moving Model based on updated values
-	model1.view = translate(identity_mat4(), vec3(0.0 + x_pos, 0.0, 0.5+z_pos));
 	glUniformMatrix4fv (proj_mat_location, 1, GL_FALSE, model1.projection.m);
 	glUniformMatrix4fv (view_mat_location, 1, GL_FALSE, model1.view.m);
 	glUniformMatrix4fv (model_location, 1, GL_FALSE, model1.model.m);
@@ -234,9 +238,25 @@ void updateScene() {
 		delta = 0.03f;
 	last_time = curr_time;
 	// Moving Camera
-	model1.model = look_at(vec3(x_mouse, y_mouse, z_mouse), vec3(0.0f, 0.0f, 0.0f), vec3(0, 1, 0));
+	// Moving View view
+
+
+	// Model View
+	//modelRotation += 0.02f;
+	//std::cout << modelRotation << std::endl;
+	model1.view = look_at(vec3(x_mouse, y_mouse, z_mouse), vec3(0.0f, 0.0f, 0.0f), vec3(0, 1, 0));
+	model1.model = identity_mat4();
+	if (modelRotationToggle == true) {
+		modelRotation = modelRotation + 0.02f;
+	}
+	model1.model = rotate_y_deg(model1.model, modelRotation);
+	model1.model = translate(model1.model, vec3(x_pos, y_pos, z_pos));
 	
-	//lightPositionUpdate(lightPositionDirection, lightPosition);
+	// Model Rotation
+
+	
+	
+	lightPositionUpdate(lightPositionDirection, lightPosition, lightPositionToggle);
 	glutPostRedisplay();
 }
 
@@ -254,7 +274,7 @@ int main(int argc, char** argv){
 	// Creating model initial values
 	// Model 1 View
 	model1.projection = perspective(90.0, (float)(width) / (float)height, 0.1, 100.0);
-	model1.view = translate(identity_mat4(), vec3(0.0, 0.0, 0.0));
+	model1.view = identity_mat4();
 	model1.model = identity_mat4();
 	model1.ortho = identity_mat4();
 

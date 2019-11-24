@@ -5,24 +5,39 @@ void keyPress(unsigned char key, int xmouse, int ymouse) {
 	switch(key){
 		// Main object movement
 		case('w'):
-			z_pos -= 0.02f;
+			y_pos -= 0.02f;
 			break;
 		case('a'):
 			x_pos -= 0.02f;
 			break;
 		case('s'):
-			z_pos += 0.02f;
+			y_pos += 0.02f;
 			break;
 		case('d'):
 			x_pos += 0.02f;
 			break;
+		case('f'):
+			z_mouse = -z_mouse;
+			break;
+		case('r'):
+			modelRotationToggle = !modelRotationToggle;
+			break;
+		case('l'):
+			lightPositionToggle = !lightPositionToggle;
+			break;
 		// Reset Condition
 		case('R'):
-			z_mouse = 1.0f;
+			z_mouse = 0.5f;
 			x_pos = 0.0f;
+			y_pos = 0.0f;
 			z_pos = 0.0f;
 			ambientStrength = 1.0f;
 			specularStrength = 1.0f;
+			modelRotationToggle = false;
+			modelRotation = 0.0f;
+			lightPositionDirection = vec3(0, 0, 0);
+			lightPosition = vec3(0, 70, 50);
+			lightPositionToggle = false;
 			break;
 	}
 };

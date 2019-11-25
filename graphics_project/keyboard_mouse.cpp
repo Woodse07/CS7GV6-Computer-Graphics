@@ -31,6 +31,12 @@ void keyPress(unsigned char key, int xmouse, int ymouse) {
 				ambientStrength = 0;
 			}
 			break;
+		case('n'):
+			ambientStrength = ambientStrength - 1;
+			if (ambientStrength < 0) {
+				ambientStrength = 5;
+			}
+			break;
 		// Reset Condition
 		case('R'):
 			z_mouse = 0.3f;

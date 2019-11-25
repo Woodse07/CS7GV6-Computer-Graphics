@@ -23,53 +23,72 @@ void main() {
 	vec3 lightDir = normalize(lightPos - fragPos);
 	vec3 norm = normalize(vsNormals);
 	if (ambientStr == 0) {
-		float intensity;
-		intensity = dot(lightDir, normalize(norm));
-		if (intensity > 0.99) {
-			color = vec4(1.0, 1.0, 1.0, 1.0);
-		}
-		else if (intensity > 0.95) {
-			color = vec4(1.0, 0.5, 0.5, 1.0);
-		}
-		else if (intensity > 0.5) {
-			color = vec4(0.6, 0.3, 0.3, 1.0);
-		}
-		else if (intensity > 0.25) {
-			color = vec4(0.4, 0.2, 0.2, 1.0);
-		}
-		else {
-			color = vec4(0.2, 0.1, 0.1, 1.0);
-		}
+		color = vec4(0.0, 0.0, 0.0, 1.0);
 	} else if (ambientStr == 1) {
 		vec3 normalDirection = normalize(vsNormals);
 		vec3 viewDirection = normalize(viewPos - fragPos);
 		float unlitOutlineThickness = 0.4f;
-		float litOutlineThickness = 0.1f;
-		vec3 outLineColor = vec3(5.0, 5.0, 5.0);
-		vec3 lightColor = vec3(1.0, 0.0, 0.0);
-		if (dot(viewDirection, normalDirection) < mix(unlitOutlineThickness, litOutlineThickness, max(0.0, dot(normalDirection, lightDir)))){
+		float litOutlineThickness = 0.4f;
+		vec3 outLineColor = vec3(0.0, 0.0, 0.0);
+		vec3 lightColor = vec3(1.0, 1.0, 1.0);
+		if (dot(viewDirection, normalDirection) < mix(unlitOutlineThickness, litOutlineThickness, max(0.0, dot(normalDirection, lightDir)))) {
 			color = vec4(vec3(outLineColor) * vec3(lightColor), 1.0);
 		}
-	}
-	else if (ambientStr == 2) {
+		else {
+			color = vec4(1.0, 1.0, 1.0, 1.0);
+		}
+	}else if (ambientStr == 2) {
 		float intensity;
 		intensity = dot(lightDir, normalize(norm));
 		if (intensity > 0.99) {
 			color = vec4(1.0, 1.0, 1.0, 1.0);
 		}
 		else if (intensity > 0.95) {
-			color = vec4(1.0, 0.5, 0.5, 1.0);
+			color = vec4(0.678, 1.0, 0.184, 1.0);
 		}
 		else if (intensity > 0.5) {
-			color = vec4(0.6, 0.3, 0.3, 1.0);
+			color = vec4(0.196, 0.804, 0.196, 1.0);
 		}
 		else if (intensity > 0.25) {
-			color = vec4(0.4, 0.2, 0.2, 1.0);
+			color = vec4(0.133, 0.545, 0.133, 1.0);
 		}
-		else {
-			color = vec4(0.2, 0.1, 0.1, 1.0);
+		else if (intensity > 0.02) {
+			color = vec4(0.000, 0.502, 0.0, 1.0);
+		} else {
+			color = vec4(0.0, 0.0, 0.0, 1.0);
 		}
-	}else if (ambientStr == 3) {
+	} else if (ambientStr == 3) {
+		vec3 normalDirection = normalize(vsNormals);
+		vec3 viewDirection = normalize(viewPos - fragPos);
+		float unlitOutlineThickness = 0.4f;
+		float litOutlineThickness = 0.4f;
+		vec3 outLineColor = vec3(0.0, 0.0, 0.0);
+		vec3 lightColor = vec3(1.0, 1.0, 1.0);
+		if (dot(viewDirection, normalDirection) < mix(unlitOutlineThickness, litOutlineThickness, max(0.0, dot(normalDirection, lightDir)))) {
+			color = vec4(vec3(outLineColor) * vec3(lightColor), 1.0);
+		} else {
+			float intensity;
+			intensity = dot(lightDir, normalize(norm));
+			if (intensity > 0.99) {
+				color = vec4(1.0, 1.0, 1.0, 1.0);
+			}
+			else if (intensity > 0.95) {
+				color = vec4(0.678, 1.0, 0.184, 1.0);
+			}
+			else if (intensity > 0.5) {
+				color = vec4(0.196, 0.804, 0.196, 1.0);
+			}
+			else if (intensity > 0.25) {
+				color = vec4(0.133, 0.545, 0.133, 1.0);
+			}
+			else if (intensity > 0.02) {
+				color = vec4(0.000, 0.502, 0.0, 1.0);
+			}
+			else {
+				color = vec4(0.0, 0.0, 0.0, 1.0);
+			}
+		}
+	}else if (ambientStr == 4) {
 		// Diffuse Lighting
 		float diff = max(dot(norm, lightDir), 0.0);
 		vec3 diffuse = diff * diffuseColor;
@@ -79,11 +98,9 @@ void main() {
 		float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
 		vec3 specular = spec * specularStr * specColor;
 		color = vec4(nEye * ambientColor + diffuse + specular, 1.0);
-	} else if (ambientStr == 4) {
+	} else if (ambientStr == 5) {
 		color = vec4(nEye, 1.0);
 		
-	} else if (ambientStr == 5) {
-		color = vec4(0.0, 0.0, 0.0, 1.0);
 	}
 	fragColour = color;
 
